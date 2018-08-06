@@ -89,10 +89,12 @@ def projectPath = groovyUtils.projectPath;
 def testCase = testRunner.testCase;
 text = "~"
 star = "*";
-int indexExcel = 5
+int indexExcel = 3
 int indexWriteResult = 1
 String temporaryNoteFirstInstance = "";
 List personIDs = [];
+// New Linh Vương
+List lstIdResult = [];
 
 String strFirstInstance = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.endPointURLInstance1");
 String strSecondInstance = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.endPointURLInstance2");
@@ -233,6 +235,7 @@ Label issueID = new Label(0, 1, "ID", cellFormat);
 Label issueSubject = new Label(1, 1, "Subject", cellFormat);
 Label issueFirstInstance = new Label(2, 1, "First Instance", cellFormat);
 Label issueSecondInstance = new Label(3, 1, "Second Instance", cellFormat);
+
 
 
 if(intLimitOfDifferentPercentage == "")
@@ -499,12 +502,12 @@ if (Arrays.asList(lstInstanceRequestID).contains(strInstance1ArticleRequestID) =
 {
 	alert.showErrorMessage("Invalid property name in instances. Please input OFWI_ID, TD_KEY or CRIFID_COREDB for instances!")
 	testRunner.cancel("Invalid property name in instances")
-	return null	
+	return null
 }
 
 //temp = indexExcel
 
-while (indexExcel <= 5)
+while (indexExcel <= 6)
 {
 	workbook = Workbook.getWorkbook(new File(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_testResults//" + "Test_Result_$testCase.name" + ".xls"),settings)
 	filePath = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_testResults//" + "Test_Result_$testCase.name" + ".xls"
@@ -731,7 +734,7 @@ while(indexRunner < wsdlTestSteps.size())
             // Trace the start time
 		    Date startStep2nd = new Date()
 		    long lStartStep2nd = startStep2nd.getTime();
-			
+
 		if (strInstance2ArticleRequestID == "TD_KEY")
 		{
 			com.eviware.soapui.SoapUI.globalProperties.setPropertyValue("companyNoID", companyTDKey);
@@ -873,7 +876,7 @@ while(indexRunner < wsdlTestSteps.size())
 	                log.error(" ${text*9} ${ex.message}");
 	                testResult = false;
 	            }
-            
+
             	if(err1 == null)
             	{
             		xmlParser = new XmlParser()
@@ -1110,72 +1113,146 @@ while(indexRunner < wsdlTestSteps.size())
 				    // --------------------------NEW--------------------------
 				    List nodeInExcel = [];
 				    Label cellResultsubject = null
+            List listIssue = [];
 				    Label cellResultis1 = null
+            List listXpathInstance = [];
 				    Label cellResultis2 = null
+            Label cellIdResult = null
+            int indexExcelSheetIssue = 1
+            while (!sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString().equals(""))
+               {
+                 if (sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString().equals(""))
+                 {
+                   break;
+                 }
+                 listIssue.add[sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString()]
+               }
+
+
 				    for(int j = 0; j <= differences.size()-1; j++)
 				    {
 						String issue = differences.get(j);
 						log.info("issuee-----------------" + issue);
 						String subject = issue.substring(0, issue.indexOf('at'));
-						String xpathInstance1 = issue.substring(issue.indexOf("/artikelList[1]"), issue.indexOf("to"));
-						String tempxpathInstance2 = issue.substring(issue.indexOf('> at /Envelope[1]/Body[1]/response[1]/artikelList[1]') + 1);
-						log.info("00000000000000000000" + tempxpathInstance2)
+						log.info("subject--------" + subject)
+//						String xpathInstance1 = issue.substring(issue.indexOf("/artikelList[1]"), issue.indexOf("to"));
+						String xpathInstance1 =  issue.substring(issue.indexOf("/artikelList[1]"), issue.indexOf("to "));
+						log.info("instance1 ===========" + xpathInstance1);
+//						String tempxpathInstance2 = issue.substring(issue.indexOf('> at /Envelope[1]/Body[1]/response[1]/artikelList[1]') + 1);
+//						log.info("00000000000000000000" + tempxpathInstance2)
 //						String xpathInstance2 = tempxpathInstance2.substring(tempxpathInstance2.indexOf('> at /Envelope[1]/Body[1]/response[1]/artikelList[1]')+1);
 						String xpathInstance2 = issue.substring(issue.lastIndexOf("/artikelList[1]")).substring("]".indexOf("]"));
-						
+						log.info("instance2 ===========" + xpathInstance2);
+            // add instance 1 xpath and instance 2 xpath to listXpath
+            listXpathInstance.add[0,xpathInstance1]
+            listXpathInstance.add[1,xpathInstance2]
 						nodeInExcel.add(subject);
-						nodeInExcel.add(xpathInstance1);
-						nodeInExcel.add(xpathInstance2);
-						log.info("subject ---------------------------" + subject);
-						log.info("xpathInstance1 -------------------------------" + xpathInstance1);
-						log.info("xpathInstance2 ---------------------------" + xpathInstance2);
-							//handle write block issue in xml to excel
-	   		
-							    File inputFile = new File(("testData.file.output.path") + "//SPC_temporaryXMLFile_FirstInstance" + "//" + "temporarely_First_XML_Response_" + "$testCase.name" + "_" + "$testStepName" + ".xml");
-			     //				File inputFile = new File("D:\\projects\\td-online\\test\\soapui-test\\SPC_temporaryXMLFile_FirstInstance\\temporarely_First_XML_Response_articleRequest_Company_brng.xml");
-						        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-						        dbFactory.setNamespaceAware(true);
-						        DocumentBuilder dBuilder;
-						        dBuilder = dbFactory.newDocumentBuilder();
-						        Document doc = dBuilder.parse(inputFile);
-						        XPath xPath =  XPathFactory.newInstance().newXPath();
-						        // print xml base on 2 xpath of 2 instance
-						        for (int m = 1; m < nodeInExcel.getLength(); m++)
-						        {
-						             String expression = "//artikelList[1]/artikel[1]/partyList[1]/party[1]";
-						       		 String expression = xpathInstance1;
-						       		 NodeList nodeList = (NodeList) xPath.compile(expression).evaluate(doc, XPathConstants.NODESET);
-						        	 Document newXmlDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-						             Element root = newXmlDocument.createElement("root");
-						             newXmlDocument.appendChild(root);
-						            for (int i = 0; i < nodeList.getLength(); i++) {
-						              Node node = nodeList.item(i);
-						              Node copyNode = newXmlDocument.importNode(node, true);
-						              root.appendChild(copyNode);
-						            }
-						            log.info("Start finding Cell index which doesn't have data yet")
-						            int IndexIssueExcel = 1
-						            while(sheetIssues.getCell(0,IndexIssueExcel) != null)
-						            {
+            //Compare current subject, if already existed then throw it, if not add to listIssue
+            if(listIssue.size() == 0)
+            {
+              listIssue.add(subject);
+              //nodeInExcel.add(xpathInstance1);
+              //listXpathInstance.add(xpathInstance1);
+              //nodeInExcel.add(xpathInstance2);
+              //listXpathInstance.add(xpathInstance2);
+            }
+            else
+            {
 
-						            	IndexIssueExcel++
-	    								
-						            }
-						          	    log.info("Index Excel which doesn't have data is " + IndexIssueExcel)
-						            	cellResultsubject = new Label(1, IndexIssueExcel,subject);
-						            	//cellResultis1 = new Label(2, IndexIssueExcel,xpathInstance1);
-						            	//cellResultis2 = new Label(3, IndexIssueExcel,xpathInstance2);
-						            	
-	    								sheetIssues.addCell(cellResultsubject)
-	    								//sheetIssues.addCell(cellResultis1)
-	    								//sheetIssues.addCell(cellResultis2)
-	    								//printXmlDocument(org.w3c.dom.Document document, WritableSheet sheetIssues, WritableCellFormat cellFormat, int indexExcelToWriteData)
-						            printXmlDocument(newXmlDocument,sheetIssues, cellFormat, IndexIssueExcel);	
-						        }
-						       
-				    	}
-                     }
-            	}
+              for (int n = 0; n < listIssue.size(); n++ )
+              {
+                if(!subject.equals(listIssue.get(n)))
+                {
+                  listIssue.add(subject)
+                  //nodeInExcel.add(xpathInstance1)
+                  //listXpathInstance.add(xpathInstance1)
+                  //nodeInExcel.add(xpathInstance2)
+                  //listXpathInstance.add(xpathInstance2)
+                  //handle write block issue in xml to excel
+                  // method WriteBlockIssueToExcel(String locationXML, String xpath, int IndexIssueToWriteIssue)
+//                  File inputFile = new File(("testData.file.output.path") + "//SPC_temporaryXMLFile_FirstInstance" + "//" + "temporarely_First_XML_Response_" + "$testCase.name" + "_" + "$testStepName" + ".xml");
+//    				String temporaryXmlFile = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_temporaryXMLFile_FirstInstance" + "//" + "temporarely_First_XML_Response_" + "$testCase.name" + "_" + "$testStepName" + ".xml"
+//    				String temporaryXmlFile2 = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_temporaryXMLFile_SecondInstance" + "//" + "temporarely_Second_XML_Response_" + "$testCase.name" + "_" + "$testStepName" + ".xml"
+    				File inputFile1 = new File(temporaryXmlFile)
+    				File inputFile2 = new File(temporaryXmlFile2)
+
+//			File inputFile1 = new File(("testData.file.output.path") + "//SPC_temporaryXMLFile_FirstInstance" + "//" + "temporarely_First_XML_Response_" + "$testCase.name" + "_" + "$testStepName" + ".xml");
+//                  File inputFile2 = new File(("testData.file.output.path") + "//SPC_temporaryXMLFile_SecondInstance" + "//" + "temporarely_First_XML_Response_" + "$testCase.name" + "_" + "$testStepName" + ".xml");
+                  //File inputFile = new File("D:\\projects\\td-online\\test\\soapui-test\\SPC_temporaryXMLFile_FirstInstance\\temporarely_First_XML_Response_articleRequest_Company_brng.xml");
+                  DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+                  dbFactory.setNamespaceAware(true);
+                  DocumentBuilder dBuilder;
+                  dBuilder = dbFactory.newDocumentBuilder();
+                  Document doc1 = dBuilder.parse(inputFile1);
+                  Document doc2 = dBuilder.parse(inputFile2);
+                  XPath xPath1 =  XPathFactory.newInstance().newXPath();
+                  XPath xPath2 =  XPathFactory.newInstance().newXPath();
+                  // print xml base on 2 xpath of 2 instance
+                  //String expression = "//artikelList[1]/artikel[1]/partyList[1]/party[1]";
+                  String  expression1 = xpathInstance1;
+                  String  expression2 = xpathInstance2;
+                      NodeList nodeListInstance1 = (NodeList) xPath1.compile(expression1).evaluate(doc1, XPathConstants.NODESET);
+                      NodeList nodeListInstance2 = (NodeList) xPath2.compile(expression2).evaluate(doc2, XPathConstants.NODESET);
+
+                      Document newXmlDocumentInstance1 = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+                      Document newXmlDocumentInstance2 = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+                      Element rootInstance1 = newXmlDocumentInstance1.createElement("root");
+                      Element rootInstance2 = newXmlDocumentInstance2.createElement("root");
+                      newXmlDocumentInstance1.appendChild(rootInstance1);
+                      newXmlDocumentInstance2.appendChild(rootInstance2);
+
+                     for (int i = 0; i < rootInstance1.getLength(); i++)
+                       {
+                            Node node = rootInstance1.item(i);
+                            Node copyNode = newXmlDocumentInstance1.importNode(node, true);
+                            rootInstance1.appendChild(copyNode);
+                       }
+                    for (int o = 0; o < rootInstance2.getLength(); o++)
+                       {
+                         Node node2 = rootInstance2.item(o);
+                         Node copyNode2 = newXmlDocumentInstance2.importNode(node2, true);
+                         rootInstance2.appendChild(copyNode2);
+                       }
+                     log.info("Start finding Cell index which doesn't have data yet")
+                     log.info("sheetIssues.getCell(0, 6).getContents().toString() is" + sheetIssues.getCell(0,6).getContents().toString())
+                     int IndexIssueExcel = 1
+                    while (!sheetIssues.getCell(0,IndexIssueExcel).getContents().toString().equals(""))
+                       {
+                       		/*if (sheetIssues.getCell(0,IndexIssueExcel) == null)
+                       		{
+                       			break;
+                       		}*/
+                              IndexIssueExcel = IndexIssueExcel + 1
+                       }
+
+
+                    String idResult = "" + IndexIssueExcel -1
+                    log.info("Index Excel which doesn't have data is " + IndexIssueExcel)
+                    cellIdResult = new Label(0, IndexIssueExcel, idResult);
+                    cellResultsubject = new Label(1, IndexIssueExcel,subject);
+                    //cellResultis1 = new Label(2, IndexIssueExcel,xpathInstance1);
+                    //cellResultis2 = new Label(3, IndexIssueExcel,xpathInstance2);
+                    sheetIssues.addCell(cellResultsubject)
+                                        //sheetIssues.addCell(cellResultis1)
+                                        //sheetIssues.addCell(cellResultis2)
+                    // Add ID into ID coloumn in sheet Issues
+                    sheetIssues.addCell(cellIdResult)
+                    // Add ID of issue Into list issue.
+                    lstIdResult.add(idResult);
+                  //def printXmlDocument(org.w3c.dom.Document document, WritableSheet sheetIssues, WritableCellFormat cellFormat, int indexExcelToWriteData, int Collumn)
+                     printXmlDocument(newXmlDocumentInstance1,sheetIssues, cellFormat, IndexIssueExcel, 2);
+                     printXmlDocument(newXmlDocumentInstance2,sheetIssues, cellFormat, IndexIssueExcel, 3);
+
+                }
+                else
+                {
+                  lstIdResult.add("" + n);
+                }
+              }
+            }
+          }
+}
+}
             	else
     			{
     			   errCompare = temporaryNoteFirstInstance;
@@ -1187,24 +1264,26 @@ while(indexRunner < wsdlTestSteps.size())
 
     		  }
 
-
-
     // Write result to ouput Excel file
 	    cellResult = new Label(indexHeaderResult, indexExcel,strFileCompareTestResult);
 	    sheetResult.addCell(cellResult)
-
 	    if(err == null)
 	    {
 	    		cellResultNotes = new Label(indexHeaderResult + 1, indexExcel, errCompare);
 	    }
-	    else
+	    else if(strFileCompareTestResult == "BLOCKED")
 	    {
 	    	    //Write notes to the external txt file - Fixed for the maximum characters of Excel cell
-	    		String testStepNoteFile = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "SPC_testResults" + "//" + "$testStepName" + "_Result_articleRequest_Details_Notes.txt"
-	    		cellResultNotes = new Label(indexHeaderResult + 1, indexExcel, "Please refer to the TXT note file " + testStepNoteFile.replace("//", "/"));
+	    		// String testStepNoteFile = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "SPC_testResults" + "//" + "$testStepName" + "_Result_articleRequest_Details_Notes.txt"
+	    		// cellResultNotes = new Label(indexHeaderResult + 1, indexExcel, "Please refer to the TXT note file " + testStepNoteFile.replace("//", "/"));
+          // --------------- NEW----------------
+          	cellResultNotes = new Label(indexHeaderResult + 1, indexExcel, "Blocked at company \"$companyName\", line number $indexExcel, reason: \"$err1 get from the first instance \"$strFirstInstance\"");
 	    }
-
-	    sheetResult.addCell(cellResultNotes);
+          else
+          	{
+          cellResultNotes = new Label(indexHeaderResult + 1, indexExcel, "Please refer to sheet Issues with ID = #" + lstIdResult.toString());
+          	}
+		sheetResult.addCell(cellResultNotes);
 
     log.info " ${text*6} End testing for test Step: $testStepName for company TD No " + companyTDKey + " at Excel data line # " +  indexExcel;
     log.info " ${text*100}";
@@ -1238,7 +1317,7 @@ if (flagRetrievedPerson == "true")
 	{
 		varArticle = listCompanyArticlesRetrievePerson[i].toString().trim()
 		if (listNameSteps.contains(varArticle))
-		{		
+		{
 		def xmlParser = new XmlParser()
         	if(strInstanceToGetPerson == "1")
         	{
@@ -1346,7 +1425,7 @@ if (flagRetrievedPerson == "true")
                                 			{
                                 				cellIDTestDataPerson = new Label(9, indexExelOutputTestDataPerson, personID);
                                 				}
-                                
+
                                 cellFirstNameTestDataPerson = new Label(1, indexExelOutputTestDataPerson, firstName);
                                 cellLastNameTestDataPerson = new Label(2, indexExelOutputTestDataPerson, lastName);
                                 cellStreetTestDataPerson = new Label(3, indexExelOutputTestDataPerson, personStreet);
@@ -1567,15 +1646,16 @@ sheetSummary.addCell(summaryTotalElapsedTimeValue);
 sheetPerformance.addCell(perfEndTimeValue);
 sheetPerformance.addCell(perfTotalElapsedTimeValue);
 //---------------------------------------------------------------- write issue into in Issues sheet---------------------------------------------------
-         def printXmlDocument(org.w3c.dom.Document document, WritableSheet sheetIssues, WritableCellFormat cellFormat, int indexExcelToWriteData)
+      //def printXmlDocument(org.w3c.dom.Document document, WritableSheet sheetIssues, WritableCellFormat cellFormat, int indexExcelToWriteData, int Collumn)
+         def printXmlDocument(org.w3c.dom.Document document, WritableSheet sheetIssues, WritableCellFormat cellFormat, int indexExcelToWriteData, int Collumn)
          {
          	log.info("======Start to write block issue in xml format to Excel file========== ")
             DOMImplementationLS domImplementationLS = (DOMImplementationLS) document
                 .getImplementation();
             LSSerializer lsSerializer = domImplementationLS.createLSSerializer();
-             String string = lsSerializer.writeToString(document); 
+             String string = lsSerializer.writeToString(document);
              log.info("Print xml document is      " + string)
-             cellResultNotesHai = new Label(0, indexExcelToWriteData, string, cellFormat);
+             cellResultNotesHai = new Label(Collumn, indexExcelToWriteData, string, cellFormat);
              sheetIssues.addCell(cellResultNotesHai);
           }
 
@@ -1623,11 +1703,11 @@ String getErrorMessageCompare(List differences)
 
 		org.w3c.dom.Node controlNode = controlNodeDetail.getNode();
 		org.w3c.dom.Node testNode = testNodeDetail.getNode();
-		if (controlNodeDetail.getNode()!=null && controlNodeDetail.getNode().getNodeType() == org.w3c.dom.Node.TEXT_NODE) 
+		if (controlNodeDetail.getNode()!=null && controlNodeDetail.getNode().getNodeType() == org.w3c.dom.Node.TEXT_NODE)
 		{
 		    controlNode = controlNodeDetail.getNode().getParentNode();
 		}
-		if (testNodeDetail.getNode()!=null && testNodeDetail.getNode().getNodeType() == org.w3c.dom.Node.TEXT_NODE) 
+		if (testNodeDetail.getNode()!=null && testNodeDetail.getNode().getNodeType() == org.w3c.dom.Node.TEXT_NODE)
 		{
 		    testNode = testNodeDetail.getNode().getParentNode();
 		}
@@ -1686,10 +1766,10 @@ String printNode(org.w3c.dom.Node nodeInput)
 }
 
 /*
- * 
- * 
- * 
- */        
+ *
+ *
+ *
+ */
    String getDocumentAsString(Document document)
         {
          String output = null;
@@ -1715,13 +1795,10 @@ String printNode(org.w3c.dom.Node nodeInput)
 //            DOMImplementationLS domImplementationLS = (DOMImplementationLS) document
 //                .getImplementation();
 //            LSSerializer lsSerializer = domImplementationLS.createLSSerializer();
-//             String string = lsSerializer.writeToString(document); 
+//             String string = lsSerializer.writeToString(document);
 //             log.info("Print xml document is      " + string)
 ////             Label cellResultNotesHai = null;
 ////             cellResultNotesHai = new Label(5, 5, string);
 //			cellResultNotesHai = new Label(5, 5, "linh xinh dep");
 //             sheetIssues.addCell(cellResultNotesHai);
 //          }
-
-
- 
