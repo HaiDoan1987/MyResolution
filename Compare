@@ -1129,23 +1129,22 @@ while(indexRunner < wsdlTestSteps.size())
 //                 }
 //                 listIssue.add[sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString()]
 //               }
-  			int indexExcelSheetIssue = 2
+  			int indexExcelSheetIssue = 1
             int u = 0;
-            log.info("====Start to collect ListIssue in SheetIssue Excel=======")
+            log.info("++++Start to collect ListIssue in SheetIssue Excel++++")
             // at every row, check if they have data, then add to listIssue
             boolean checkWhileLoadIssueData = false
-            checkWhileLoadIssueData = !sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString().equals("")
-            log.info("Check row " + indexExcelSheetIssue + "checkWhileLoadIssueData " + checkWhileLoadIssueData)
+            isRowEmpty = sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString().equals("")
+            log.info("Check row " + indexExcelSheetIssue + "isRowEmpty " + isRowEmpty)
             while (!sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString().equals(""))
                {
-                 checkWhileLoadIssueData = !sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString().equals("")
-                 log.info("Check row " + indexExcelSheetIssue + "checkWhileLoadIssueData status boolean is " + checkWhileLoadIssueData)
-                 listIssue.add[sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString()]
-                 log.info("at row " + indexExcelSheetIssue + "listIssue is added " + listIssue.get[u])
+                 log.info("Check row " + indexExcelSheetIssue + "isRowEmpty status boolean is " + isRowEmpty)
+                 listIssue.add(sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString())
+              //   log.info("at row " + indexExcelSheetIssue + "listIssue is added " + listIssue.get[u])
                  indexExcelSheetIssue++
+                 u++
                }
-            log.info("======List issue size is ========" + listIssue.size())
-
+            log.info("++++List issue size is +++++" + listIssue.size())
 				    for(int j = 0; j <= differences.size()-1; j++)
 				    {
             String issue = differences.get(j);
@@ -1215,21 +1214,21 @@ while(indexRunner < wsdlTestSteps.size())
                   }
     				     // File inputFile1 = new File(temporaryXmlFile)
     				     // File inputFile2 = new File(temporaryXmlFile2)
-				          int q = 0
+				          int collumnIndexToWriteIssue2Instance = 2
+                  log.info("=======Start finding Cell index which doesn't have data yet=======")
+                  int IndexIssueExcel = 2
+                  boolean isRowEmptyInSheetIssue = sheetIssues.getCell(0,IndexIssueExcel).getContents().toString().equals("")
+                  log.info("at row " + IndexIssueExcel + " isRowEmptyInSheetIssue status is " + isRowEmptyInSheetIssue)
+                  while (!sheetIssues.getCell(0,IndexIssueExcel).getContents().toString().equals(""))
+                    {
+                           log.info("at row " + IndexIssueExcel  + " is " + sheetIssues.getCell(0,IndexIssueExcel).getContents().toString())
+                           IndexIssueExcel = IndexIssueExcel + 1
+                    }
+                  String idResult = "" + IndexIssueExcel -2
+                  log.info("Index Excel which doesn't have data is " + IndexIssueExcel)
                   for (int w = 0; w < locationXMLFileOf2Instance.size(); w++)
                   {
-                              q = 2
-                              log.info("=======Start finding Cell index which doesn't have data yet=======")
-                              int IndexIssueExcel = 1
-                              boolean isRowHasData = !sheetIssues.getCell(0,IndexIssueExcel).getContents().toString().equals("")
-                              log.info("at row " + IndexIssueExcel + " isRowHasData status is " + isRowHasData)
-                              while (!isRowHasData)
-                                {
-                                		   log.info("at row " + IndexIssueExcel  + " is " + sheetIssues.getCell(0,IndexIssueExcel).getContents().toString())
-                                       IndexIssueExcel = IndexIssueExcel + 1
-                                }
-                              String idResult = "" + IndexIssueExcel -2
-                              log.info("Index Excel which doesn't have data is " + IndexIssueExcel)
+
                               cellIdResult = new Label(0, IndexIssueExcel, idResult);
                               cellResultsubject = new Label(1, IndexIssueExcel,subject);
                               //cellResultis1 = new Label(2, IndexIssueExcel,xpathInstance1);
@@ -1242,20 +1241,17 @@ while(indexRunner < wsdlTestSteps.size())
                               // Add ID of issue Into list issue.
                               lstIdResult.add(idResult);
                               //log list xpath isntance 1 and 2
-                                        log.info(" listXpathInstance.size() is " + listXpathInstance.size())
-                                        for(int t = 0; t < listXpathInstance.size(); t++)
-                                        {
-                                            log.info("instance" + t +  " in listXpathInstance xpath is " + listXpathInstance.get(t))
-                                        }
-                              log.info(" w is " + w)
+                              log.info(" listXpathInstance.size() is " + listXpathInstance.size())
+                              log.info("instance" + w +  " in listXpathInstance xpath is " + listXpathInstance.get(w))
                               if (listXpathInstance.get(w).equals("null"))
                               {
-                                    cellXpathNull = new Label(q, IndexIssueExcel, "null")
+                                    cellXpathNull = new Label(collumnIndexToWriteIssue2Instance, IndexIssueExcel, "null")
+                                    collumnIndexToWriteIssue2Instance++
                               }
                             else
                               {
                               // Parse Xpath to Xml format
-                          /*    String locationXMLFileOf2InstanceFinal = locationXMLFileOf2Instance.get(w).replace('////', '//');
+                              String locationXMLFileOf2InstanceFinal = locationXMLFileOf2Instance.get(w).replace('////', '//');
                               log.info("====== locationXMLFileOf2Instance.get(w) " + locationXMLFileOf2InstanceFinal +  " ==============")
                               File inputFile = new File(locationXMLFileOf2Instance.get(w))
                               DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance()
@@ -1275,44 +1271,17 @@ while(indexRunner < wsdlTestSteps.size())
                               newXmlDocument.appendChild(root);
                               for (int i = 0; i < nodeList.getLength(); i++)
                                {
-                                  Node node = nodeList.item(i);
+                                  org.w3c.dom.Node node = nodeList.item(i);
                                   log.info("node " + i + " " + node)
-                                  Node copyNode = newXmlDocument.importNode(node, true)
+                                  org.w3c.dom.Node copyNode = newXmlDocument.importNode(node, true)
                                   log.info("copyNode " + i + " " + copyNode)
                                   root.appendChild(copyNode)
                                }
                                 // Write XML issue to Excel
                                 //def printXmlDocument(org.w3c.dom.Document document, WritableSheet sheetIssues, WritableCellFormat cellFormat, int indexExcelToWriteData, int Collumn)
-                               printXmlDocument(newXmlDocument,sheetIssues, cellFormat, IndexIssueExcel, q);*/
-                               File inputFile = new File("D://temporarely_First_XML_Response_searchCompanyRequest_fhitfuzzy.xml");
-                 DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-                 dbFactory.setNamespaceAware(true);
-                 DocumentBuilder dBuilder;
-                 dBuilder = dbFactory.newDocumentBuilder();
-                 Document doc = dBuilder.parse(inputFile);
-                 //log.info("doc " + w + " " + doc);
-                 XPath xPath =  XPathFactory.newInstance().newXPath();
-                 String expression = "//artikelList[1]/artikel[1]/partyList[1]/party[1]";
-                // log.info("xpath expression " + w + " " + expression);
-                 NodeList nodeList = (NodeList) xPath.compile(expression.trim()).evaluate(doc, XPathConstants.NODESET);
-                 Document newXmlDocument = DocumentBuilderFactory.newInstance()
-                         .newDocumentBuilder().newDocument();
-                 Element root = newXmlDocument.createElement("root");
-               //  log.info("root " + w + " " + root)
-                 newXmlDocument.appendChild(root);
-                 for (int i = 0; i < nodeList.getLength(); i++)
-                  {
-                     Node node = nodeList.item(i);
-                     //log.info("node " + i + " " + node);
-                     Node copyNode = newXmlDocument.importNode(node, true);
-                     //log.info("copyNode " + i + " " + copyNode);
-                     root.appendChild(copyNode);
-                  }
-                   // Write XML issue to Excel
-                   //def printXmlDocument(org.w3c.dom.Document document, WritableSheet sheetIssues, WritableCellFormat cellFormat, int indexExcelToWriteData, int Collumn)
-                  printJavaXmlDocument(newXmlDocument);
-                        }
-                        w++
+                               printXmlDocument(newXmlDocument,sheetIssues, cellFormat, IndexIssueExcel, collumnIndexToWriteIssue2Instance);
+                               collumnIndexToWriteIssue2Instance++
+                              }
                   }
                 }
                 else
@@ -1320,6 +1289,12 @@ while(indexRunner < wsdlTestSteps.size())
                   lstIdResult.add("" + n);
                 }
               }
+              //log check listIssue
+              log.info("***** Check list issue data******")
+              for(int indexListIssue = 0; indexListIssue < listIssue.size(); indexListIssue++ )
+                {
+                  log.info("Data at index " + indexListIssue + " is " + listIssue.get(indexListIssue))
+                }
             }
           }
 }
