@@ -1129,13 +1129,11 @@ while(indexRunner < wsdlTestSteps.size())
 //                 }
 //                 listIssue.add[sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString()]
 //               }
+        log.inf("STAR DEBUGGING =================> ")
   			int indexExcelSheetIssue = 1
             int u = 0;
             log.info("++++Start to collect ListIssue in SheetIssue Excel++++")
             // at every row, check if they have data, then add to listIssue
-            boolean checkWhileLoadIssueData = false
-            isRowEmpty = sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString().equals("")
-            log.info("Check row " + indexExcelSheetIssue + "isRowEmpty " + isRowEmpty)
             while (!sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString().equals(""))
                {
                  log.info("Check row " + indexExcelSheetIssue + "isRowEmpty status boolean is " + isRowEmpty)
@@ -1193,101 +1191,111 @@ while(indexRunner < wsdlTestSteps.size())
             }
             else
             {
-            //  listXpathInstance.add(0,xpathInstance1)
-            //  listXpathInstance.add(1,xpathInstance2)
-              for (int n = 0; n < listIssue.size(); n++ )
-              {
-              	log.info("listIssue at Index " + n + listIssue.get(n))
-                if(!subject.equals(listIssue.get(n)))
-                {
-
-                  listIssue.add(subject)
-                  if (locationXMLFileOf2Instance.size() > 0)
+                log.info("============= Start check if subject already existed in listIssue ==========================")
+                boolean isIssueExistedInListIssue = true
+                  for (int n = 0; n < listIssue.size(); n++ )
                   {
-                    locationXMLFileOf2Instance.set(0,temporaryXmlFile)
-                    locationXMLFileOf2Instance.set(1,temporaryXmlFile2)
-                  }
-                  else
-                  {
-                    locationXMLFileOf2Instance.add(0,temporaryXmlFile)
-                    locationXMLFileOf2Instance.add(1,temporaryXmlFile2)
-                  }
-    				     // File inputFile1 = new File(temporaryXmlFile)
-    				     // File inputFile2 = new File(temporaryXmlFile2)
-				          int collumnIndexToWriteIssue2Instance = 2
-                  log.info("=======Start finding Cell index which doesn't have data yet=======")
-                  int IndexIssueExcel = 2
-                  boolean isRowEmptyInSheetIssue = sheetIssues.getCell(0,IndexIssueExcel).getContents().toString().equals("")
-                  log.info("at row " + IndexIssueExcel + " isRowEmptyInSheetIssue status is " + isRowEmptyInSheetIssue)
-                  while (!sheetIssues.getCell(0,IndexIssueExcel).getContents().toString().equals(""))
+                    log.info(" --------- Comparing between new issue " + subject + " with listIssue at index " + n + " " + listIssue.get(n))
+                    if (subject.equals(listIssue.get(n)))
                     {
-                           log.info("at row " + IndexIssueExcel  + " is " + sheetIssues.getCell(0,IndexIssueExcel).getContents().toString())
-                           IndexIssueExcel = IndexIssueExcel + 1
+                          isIssueExistedInListIssue = true
+                          log.info("..... this issue  " + subject + " already existed in listIssue at index " + n + ".......")
+                          log.info(".... Issue in listIssue at index " + n " is " + listIssue.get(n))
+                          break
                     }
-                  String idResult = "" + IndexIssueExcel -2
-                  log.info("Index Excel which doesn't have data is " + IndexIssueExcel)
-                  for (int w = 0; w < locationXMLFileOf2Instance.size(); w++)
-                  {
-
-                              cellIdResult = new Label(0, IndexIssueExcel, idResult);
-                              cellResultsubject = new Label(1, IndexIssueExcel,subject);
-                              //cellResultis1 = new Label(2, IndexIssueExcel,xpathInstance1);
-                              //cellResultis2 = new Label(3, IndexIssueExcel,xpathInstance2);
-                              sheetIssues.addCell(cellResultsubject)
-                                                  //sheetIssues.addCell(cellResultis1)
-                                                  //sheetIssues.addCell(cellResultis2)
-                              // Add ID into ID coloumn in sheet Issues
-                              sheetIssues.addCell(cellIdResult)
-                              // Add ID of issue Into list issue.
-                              lstIdResult.add(idResult);
-                              //log list xpath isntance 1 and 2
-                              log.info(" listXpathInstance.size() is " + listXpathInstance.size())
-                              log.info("instance" + w +  " in listXpathInstance xpath is " + listXpathInstance.get(w))
-                              if (listXpathInstance.get(w).equals("null"))
-                              {
-                                    cellXpathNull = new Label(collumnIndexToWriteIssue2Instance, IndexIssueExcel, "null")
-                                    collumnIndexToWriteIssue2Instance++
-                              }
-                            else
-                              {
-                              // Parse Xpath to Xml format
-                              String locationXMLFileOf2InstanceFinal = locationXMLFileOf2Instance.get(w).replace('////', '//');
-                              log.info("====== locationXMLFileOf2Instance.get(w) " + locationXMLFileOf2InstanceFinal +  " ==============")
-                              File inputFile = new File(locationXMLFileOf2Instance.get(w))
-                              DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance()
-                              dbFactory.setNamespaceAware(true)
-                              DocumentBuilder dBuilder
-                              dBuilder = dbFactory.newDocumentBuilder()
-                              Document doc = dBuilder.parse(inputFile)
-                              log.info("doc " + w + " " + doc)
-                              XPath xPath =  XPathFactory.newInstance().newXPath()
-                              String expression = "/" + listXpathInstance.get(w)
-                              log.info("xpath expression " + w + " " + expression)
-                              NodeList nodeList = (NodeList) xPath.compile(expression.trim()).evaluate(doc, XPathConstants.NODESET);
-                              Document newXmlDocument = DocumentBuilderFactory.newInstance()
-                                      .newDocumentBuilder().newDocument();
-                              Element root = newXmlDocument.createElement("root")
-                              log.info("root " + w + " " + root)
-                              newXmlDocument.appendChild(root);
-                              for (int i = 0; i < nodeList.getLength(); i++)
-                               {
-                                  org.w3c.dom.Node node = nodeList.item(i);
-                                  log.info("node " + i + " " + node)
-                                  org.w3c.dom.Node copyNode = newXmlDocument.importNode(node, true)
-                                  log.info("copyNode " + i + " " + copyNode)
-                                  root.appendChild(copyNode)
-                               }
-                                // Write XML issue to Excel
-                                //def printXmlDocument(org.w3c.dom.Document document, WritableSheet sheetIssues, WritableCellFormat cellFormat, int indexExcelToWriteData, int Collumn)
-                               printXmlDocument(newXmlDocument,sheetIssues, cellFormat, IndexIssueExcel, collumnIndexToWriteIssue2Instance);
-                               collumnIndexToWriteIssue2Instance++
-                              }
+                    isIssueExistedInListIssue = false
                   }
-                }
-                else
-                {
-                  lstIdResult.add("" + n);
-                }
+
+                      if(isIssueExistedInListIssue == false)
+                      {
+                        listIssue.add(subject)
+                        log.info("..... this issue  " + subject + " is added to the list ..........")
+                        if (locationXMLFileOf2Instance.size() > 0)
+                        {
+                            locationXMLFileOf2Instance.set(0,temporaryXmlFile)
+                            locationXMLFileOf2Instance.set(1,temporaryXmlFile2)
+                        }
+                        else
+                        {
+                            locationXMLFileOf2Instance.add(0,temporaryXmlFile)
+                            locationXMLFileOf2Instance.add(1,temporaryXmlFile2)
+                        }
+          				     // File inputFile1 = new File(temporaryXmlFile)
+          				     // File inputFile2 = new File(temporaryXmlFile2)
+      				          int collumnIndexToWriteIssue2Instance = 2
+                        log.info("=======Start finding Cell index which doesn't have data yet=======")
+                        int IndexIssueExcel = 2
+                        boolean isRowEmptyInSheetIssue = sheetIssues.getCell(0,IndexIssueExcel).getContents().toString().equals("")
+                        log.info("at row " + IndexIssueExcel + " isRowEmptyInSheetIssue status is " + isRowEmptyInSheetIssue)
+                        while (!sheetIssues.getCell(0,IndexIssueExcel).getContents().toString().equals(""))
+                          {
+                                 log.info("at row " + IndexIssueExcel  + " is " + sheetIssues.getCell(0,IndexIssueExcel).getContents().toString())
+                                 IndexIssueExcel = IndexIssueExcel + 1
+                          }
+                        String idResult = "" + IndexIssueExcel -2
+                        log.info("Index Excel which doesn't have data is " + IndexIssueExcel)
+                        for (int w = 0; w < locationXMLFileOf2Instance.size(); w++)
+                        {
+
+                                    cellIdResult = new Label(0, IndexIssueExcel, idResult);
+                                    cellResultsubject = new Label(1, IndexIssueExcel,subject);
+                                    //cellResultis1 = new Label(2, IndexIssueExcel,xpathInstance1);
+                                    //cellResultis2 = new Label(3, IndexIssueExcel,xpathInstance2);
+                                    sheetIssues.addCell(cellResultsubject)
+                                                        //sheetIssues.addCell(cellResultis1)
+                                                        //sheetIssues.addCell(cellResultis2)
+                                    // Add ID into ID coloumn in sheet Issues
+                                    sheetIssues.addCell(cellIdResult)
+                                    // Add ID of issue Into list issue.
+                                    lstIdResult.add(idResult);
+                                    //log list xpath isntance 1 and 2
+                                    log.info(" listXpathInstance.size() is " + listXpathInstance.size())
+                                    log.info("instance" + w +  " in listXpathInstance xpath is " + listXpathInstance.get(w))
+                                    if (listXpathInstance.get(w).equals("null"))
+                                    {
+                                          cellXpathNull = new Label(collumnIndexToWriteIssue2Instance, IndexIssueExcel, "null")
+                                          collumnIndexToWriteIssue2Instance++
+                                    }
+                                  else
+                                    {
+                                    // Parse Xpath to Xml format
+                                    String locationXMLFileOf2InstanceFinal = locationXMLFileOf2Instance.get(w).replace('////', '//');
+                                    log.info("====== locationXMLFileOf2Instance.get(w) " + locationXMLFileOf2InstanceFinal +  " ==============")
+                                    File inputFile = new File(locationXMLFileOf2Instance.get(w))
+                                    DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance()
+                                    dbFactory.setNamespaceAware(true)
+                                    DocumentBuilder dBuilder
+                                    dBuilder = dbFactory.newDocumentBuilder()
+                                    Document doc = dBuilder.parse(inputFile)
+                                    log.info("doc " + w + " " + doc)
+                                    XPath xPath =  XPathFactory.newInstance().newXPath()
+                                    String expression = "/" + listXpathInstance.get(w)
+                                    log.info("xpath expression " + w + " " + expression)
+                                    NodeList nodeList = (NodeList) xPath.compile(expression.trim()).evaluate(doc, XPathConstants.NODESET);
+                                    Document newXmlDocument = DocumentBuilderFactory.newInstance()
+                                            .newDocumentBuilder().newDocument();
+                                    Element root = newXmlDocument.createElement("root")
+                                    log.info("root " + w + " " + root)
+                                    newXmlDocument.appendChild(root);
+                                    for (int i = 0; i < nodeList.getLength(); i++)
+                                     {
+                                        org.w3c.dom.Node node = nodeList.item(i);
+                                        log.info("node " + i + " " + node)
+                                        org.w3c.dom.Node copyNode = newXmlDocument.importNode(node, true)
+                                        log.info("copyNode " + i + " " + copyNode)
+                                        root.appendChild(copyNode)
+                                     }
+                                      // Write XML issue to Excel
+                                      //def printXmlDocument(org.w3c.dom.Document document, WritableSheet sheetIssues, WritableCellFormat cellFormat, int indexExcelToWriteData, int Collumn)
+                                     printXmlDocument(newXmlDocument,sheetIssues, cellFormat, IndexIssueExcel, collumnIndexToWriteIssue2Instance);
+                                     collumnIndexToWriteIssue2Instance++
+                                    }
+                        }
+                      }
+                      else
+                      {
+                        lstIdResult.add("" + n);
+                      }
               }
               //log check listIssue
               log.info("***** Check list issue data******")
