@@ -1123,23 +1123,21 @@ while(indexRunner < wsdlTestSteps.size())
             Label cellResultsubject = null
             int indexIssueExistedInListIssue = 0;
             boolean isIssueExistedInListIssue = false
-                    List listIssue = [];
+            List listIssue = [];
             Label cellResultis1 = null
             Label cellResultis2 = null
-                Label cellIdResult = null
-                Label cellXpathNull = null
-                log.info("STAR DEBUGGING =================> ")
-                lstIdResult =[]
-                log.info("listIDResult  at start " + lstIdResult.toString())
+            Label cellIdResult = null
+            Label cellXpathNull = null
+            log.info("STAR DEBUGGING =================> ")
+            lstIdResult =[]
+            log.info("listIDResult  at start " + lstIdResult.toString())
             int indexExcelSheetIssue = 2
-                int u = 0;
                 log.info("++++Start to collect ListIssue in SheetIssue Excel++++")
                 // At every row, check if they have data, then add to listIssue
                 while (!sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString().equals(""))
                    {
                      listIssue.add(sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString())
                      indexExcelSheetIssue++
-                     u++
                    }
                 log.info("++++List issue size is +++++" + listIssue.size())
                 // ==============REFACTOR GET SUBJECT/XPATH1/XPATH2===============
