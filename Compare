@@ -1126,8 +1126,6 @@ while(indexRunner < wsdlTestSteps.size())
             		    List listIssue = [];
 				    Label cellResultis1 = null
 				    Label cellResultis2 = null
-		            List listXpathInstance = new ArrayList<String>();
-		            List locationXMLFileOf2Instance = [];
 		            Label cellIdResult = null
 		            Label cellXpathNull = null
         			  log.info("STAR DEBUGGING =================> ")
@@ -1148,6 +1146,8 @@ while(indexRunner < wsdlTestSteps.size())
 		            // ==============REFACTOR GET SUBJECT/XPATH1/XPATH2===============
 				    for(int j = 0; j <= differences.size()-1; j++)
 				    {
+              List listXpathInstance = [];
+              List locationXMLFileOf2Instance = [];
 				    	Difference difference;
 	    				difference = differences.get(j);
 				    	if(!difference.isRecoverable())
@@ -1207,7 +1207,7 @@ while(indexRunner < wsdlTestSteps.size())
                     {
                       listXpathInstance.add(0,xpathInstance1)
                       listXpathInstance.add(1,xpathInstance2)
-                    }
+
             		//Compare current subject, if already existed then throw it, if not add to listIssue
                     if(listIssue.size() == 0)
                     {
@@ -1220,35 +1220,35 @@ while(indexRunner < wsdlTestSteps.size())
                           {
                             log.info(" --------- Comparing between new issue " + subject + " with listIssue at index " + n + " " + listIssue.get(n))
                             if (subject.equals(listIssue.get(n)))
-                            {
-                                  isIssueExistedInListIssue = true
-                                  indexIssueExistedInListIssue = n
-                                  log.info("..... this issue  " + subject + " already existed in listIssue at index " + n + ".......")
-                                  log.info(".... Issue in listIssue at index " + n + " is " + listIssue.get(n))
-                                  indexIssueExistedInListIssue = indexIssueExistedInListIssue + 1
-                                  // ======================Check duplicate Id in lstIdResult 09 August 2018==============
-                    							boolean isIdExistedInLstId = false
-                    							for(int indexId = 0; indexId < lstIdResult.size(); indexId++)
-                    							{
-                      								if(indexIssueExistedInListIssue == lstIdResult.get(indexId))
-                      									{
-                      										isIdExistedInLstId = true
-                      									}
-                    							}
-                    					  	if (isIdExistedInLstId == false)
-                    								{
-                    										lstIdResult.add(indexIssueExistedInListIssue)
-                    								}
+                              {
+                                    isIssueExistedInListIssue = true
+                                    indexIssueExistedInListIssue = n
+                                    log.info("..... this issue  " + subject + " already existed in listIssue at index " + n + ".......")
+                                    log.info(".... Issue in listIssue at index " + n + " is " + listIssue.get(n))
+                                    indexIssueExistedInListIssue = indexIssueExistedInListIssue + 1
+                                    // ======================Check duplicate Id in lstIdResult 09 August 2018==============
+                      							boolean isIdExistedInLstId = false
+                      							for(int indexId = 0; indexId < lstIdResult.size(); indexId++)
+                      							{
+                        								if(indexIssueExistedInListIssue == lstIdResult.get(indexId))
+                        									{
+                        										isIdExistedInLstId = true
+                        									}
+                      							}
+                      					  	if (isIdExistedInLstId == false)
+                      								{
+                      										lstIdResult.add(indexIssueExistedInListIssue)
+                      								}
 
-                                   break
-                            }
+                                     break
+                              }
                             isIssueExistedInListIssue = false
+                            log.info("..... this issue  " + subject + " is added to the list ..........")
                             listIssue.add(subject)
                           }
                       }
-                              if(isIssueExistedInListIssue == false || listIssue.size() == 1)
+                              if(isIssueExistedInListIssue == false)
                               {
-                                log.info("..... this issue  " + subject + " is added to the list ..........")
                                 if (locationXMLFileOf2Instance.size() > 0)
                                 {
                                     locationXMLFileOf2Instance.set(0,temporaryXmlFile)
@@ -1274,7 +1274,6 @@ while(indexRunner < wsdlTestSteps.size())
                                 lstIdResult.add(idResult);
                                 for (int w = 0; w < locationXMLFileOf2Instance.size(); w++)
                                 {
-
                                             cellIdResult = new Label(0, IndexIssueExcel, idResult);
                                             cellResultsubject = new Label(1, IndexIssueExcel,subject);
                                             sheetIssues.addCell(cellResultsubject)
