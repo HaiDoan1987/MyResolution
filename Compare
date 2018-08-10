@@ -1223,15 +1223,17 @@ while(indexRunner < wsdlTestSteps.size())
                                         isIssueExistedInListIssue = true
                                         indexIssueExistedInListIssue = indexListIssue
                                         log.info("..... this issue  " + subject + " already existed in listIssue at index " + indexListIssue + ".......")
-                                        log.info(".... Issue in listIssue at index " + indexListIssue + " is " + listIssue.get(indexListIssue))
                                         indexIssueExistedInListIssue = indexIssueExistedInListIssue + 1
                                         // ======================Check duplicate Id in lstIdResult 09 August 2018==============
+                                        log.info(" ======= start check if  indexIssueExistedInListIssue is existed in lstIdResult or not ========")
                                         boolean isIdExistedInLstId = false
                                         for(int indexId = 0; indexId < lstIdResult.size(); indexId++)
                                         {
+
                                             if(indexIssueExistedInListIssue == lstIdResult.get(indexId))
                                               {
                                                 isIdExistedInLstId = true
+                                                break;
                                               }
                                         }
                                         if (isIdExistedInLstId == false)
@@ -1242,7 +1244,6 @@ while(indexRunner < wsdlTestSteps.size())
                                          break
                                   }
                                 isIssueExistedInListIssue = false
-                                log.info("..... this issue  " + subject + " is added to the list ..........")
                               }
                           }
 
@@ -1287,6 +1288,12 @@ while(indexRunner < wsdlTestSteps.size())
                                                 Document doc = dBuilder.parse(inputFile)
                                                 XPath xPath =  XPathFactory.newInstance().newXPath()
                                                 String expression = "/" + listXpathInstance.get(w)
+                                                //10-08 6:45 pm Improve write node - Hải
+                                                ///Envelope[1]/Body[1]/response[1]/artikelList[1]/artikel[1]/party[1]/address[1]/city[1]/text()[1]
+                                                if (expression.contains("text()"))
+                                                  {
+                                                    expression = expression.substring(0, expression.indexOf("/text()"))
+                                                  }
                                                 log.info("xpath expression " + w + " " + expression)
                                                 NodeList nodeList = (NodeList) xPath.compile(expression.trim()).evaluate(doc, XPathConstants.NODESET);
                                                 Document newXmlDocument = DocumentBuilderFactory.newInstance()
