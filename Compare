@@ -94,12 +94,13 @@ def projectPath = groovyUtils.projectPath;
 def testCase = testRunner.testCase;
 text = "~"
 star = "*";
-int indexExcel = 37
+int indexExcel = 24
 int indexWriteResult = 1
 String temporaryNoteFirstInstance = "";
 List personIDs = [];
 // =========NEW=========Release 1045 SPC - Refactor the SPC reporting==============
 List lstIdResult = [];
+
 
 String strFirstInstance = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.endPointURLInstance1");
 String strSecondInstance = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.endPointURLInstance2");
@@ -511,7 +512,7 @@ if (Arrays.asList(lstInstanceRequestID).contains(strInstance1ArticleRequestID) =
 }
 
 
-while (indexExcel <= 45)
+while (indexExcel <= 30)
 {
   workbook = Workbook.getWorkbook(new File(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_testResults//" + "Test_Result_$testCase.name" + ".xls"),settings)
   filePath = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_testResults//" + "Test_Result_$testCase.name" + ".xls"
@@ -1103,21 +1104,11 @@ while(indexRunner < wsdlTestSteps.size())
                      }
                      else
                      {
-          errCompare = getErrorMessageCompare(differences);
+          		 errCompare = getErrorMessageCompare(differences);
                      log.error " ${text*9} Compare XML files - Result testing for testStep $testStepName : ------>>>>>> FAILED due to the missmatch error " + errCompare;
                      temporaryList = mapResult.get("$testStepName")
                      int temporaryInt = temporaryList.get(1) + 1
                      temporaryList.set(1, temporaryInt);
-//                     String temporaryNoteOld = temporaryList.get(3).toString()
-//                     String temporaryNoteNew = "*** Failed at company \"$companyName\", line number $indexExcel, reason: " + errCompare.toString() + "\n" + "\n"
-//                     temporaryNoteReport = temporaryNoteOld + temporaryNoteNew
-//                     temporaryList.set(3, temporaryNoteReport);
-//                     mapResult.put("$testStepName", temporaryList)
-//                     temporaryNoteReport = ""
-//                     temporaryNoteNew = ""
-//                     String testStepNoteFile = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "SPC_testResults" + "//" + "$testStepName" + "_Result_articleRequest_Details_Notes.txt"
-//            errCompare = "Please refer to the TXT note file " + testStepNoteFile.replace("//", "/")
-
 
             // -=========NEW=========Release 1045 SPC - Refactor the SPC reporting==============
             Label cellResultsubject = null
@@ -1126,23 +1117,27 @@ while(indexRunner < wsdlTestSteps.size())
             List listIssue = [];
             Label cellResultis1 = null
             Label cellResultis2 = null
-            Label cellIdResult = null
-            Label cellXpathNull = null
-            log.info("STAR DEBUGGING =================> ")
-            lstIdResult =[]
-            log.info("listIDResult  at start " + lstIdResult.toString())
+                Label cellIdResult = null
+                Label cellXpathNull = null
+                log.info("STAR DEBUGGING =================> ")
+                lstIdResult =[]
+                log.info("listIDResult  at start " + lstIdResult.toString())
             int indexExcelSheetIssue = 2
+                int u = 0;
                 log.info("++++Start to collect ListIssue in SheetIssue Excel++++")
                 // At every row, check if they have data, then add to listIssue
                 while (!sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString().equals(""))
                    {
                      listIssue.add(sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString())
                      indexExcelSheetIssue++
+                     u++
                    }
                 log.info("++++List issue size is +++++" + listIssue.size())
                 // ==============REFACTOR GET SUBJECT/XPATH1/XPATH2===============
             for(int j = 0; j <= differences.size()-1; j++)
             {
+            	// ==========new==========release v2 1045 SPC - Refactor the SPC reporting=======
+			        List lstUnknowIssue = [];
               List listXpathInstance = [];
               List locationXMLFileOf2Instance = [];
               Difference difference;
@@ -1168,6 +1163,11 @@ while(indexRunner < wsdlTestSteps.size())
                                 {
                                   xpathInstance1 = tempxpathInstance1.substring(tempxpathInstance1.indexOf("/artikelList[1]"), tempxpathInstance1.lastIndexOf("/@")).trim()
                                 }
+                                // ==========new==========release v2 1045 SPC - Refactor the SPC reporting=======
+                                else if (!tempxpathInstance1.contains("/artikelList[1]"))
+                                {
+                                	lstUnknowIssue.add(tempxpathInstance1);
+                                }
                                 else
                                 {
                                    xpathInstance1 = tempxpathInstance1.substring(tempxpathInstance1.indexOf("/artikelList[1]")).substring("]".indexOf("]")).trim();
@@ -1185,19 +1185,32 @@ while(indexRunner < wsdlTestSteps.size())
                               {
                                 xpathInstance2 = tempxpathInstance2.substring(tempxpathInstance2.lastIndexOf("/artikelList[1]"), tempxpathInstance2.lastIndexOf("/@")).trim()
                               }
+                              // ==========new==========release v2 1045 SPC - Refactor the SPC reporting=======
+                                else if (!tempxpathInstance2.contains("/artikelList[1]"))
+                                {
+                                	lstUnknowIssue.add(tempxpathInstance2);
+                                }
                               else
                               {
                                  xpathInstance2 = tempxpathInstance2.substring(tempxpathInstance2.lastIndexOf("/artikelList[1]")).substring("]".indexOf("]")).trim();
                               }
                             }
                             log.info("instance2 ===========" + xpathInstance2);
-
+                            // ==========new==========release v2 1045 SPC - Refactor the SPC reporting=======
+					if (lstUnknowIssue.size() > 0)
+					{
+						testResult = false;
+            				strFileCompareTestResult = "BLOCKED"
+            				err1 = issue
+            				break
+         }
+						else
+						{
                         // add instance 1 xpath and instance 2 xpath to listXpath
                           listXpathInstance.add(0,xpathInstance1)
                           listXpathInstance.add(1,xpathInstance2)
                           locationXMLFileOf2Instance.add(0,temporaryXmlFile)
                           locationXMLFileOf2Instance.add(1,temporaryXmlFile2)
-
                     //Compare current subject, if already existed then throw it, if not add to listIssue
                         if (listIssue.size() > 0)
                         {
@@ -1294,7 +1307,8 @@ while(indexRunner < wsdlTestSteps.size())
                           }
                   //}
                   //log check listIssue
-
+                  // ==========new==========release v2 1045 SPC - Refactor the SPC reporting=======
+                        }
                     }
             }
   }
@@ -1329,7 +1343,7 @@ while(indexRunner < wsdlTestSteps.size())
       if(strFileCompareTestResult == "BLOCKED")
       {
           // ---=========NEW=========Release 1045 SPC - Refactor the SPC reporting==============
-            cellResultNotes = new Label(indexHeaderResult + 1, indexExcel, "Blocked at company \"$companyName\", line number $indexExcel, reason: \"$err1 get from the first instance \"$strFirstInstance\"");
+            cellResultNotes = new Label(indexHeaderResult + 1, indexExcel, "Blocked at company \"$companyName\", line number $indexExcel, reason: \"$err1 ");
       }
           if(strFileCompareTestResult == "FAILED")
           {
