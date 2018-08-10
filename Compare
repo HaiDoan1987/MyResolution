@@ -53,8 +53,13 @@ import org.w3c.dom.ls.LSSerializer;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import java.lang.Object
+import org.custommonkey.xmlunit.Difference
+//import org.custommonkey.xmlunit
 
 
+import groovy.xml.XmlUtil
+import org.custommonkey.xmlunit.*
 
 
 
@@ -89,11 +94,11 @@ def projectPath = groovyUtils.projectPath;
 def testCase = testRunner.testCase;
 text = "~"
 star = "*";
-int indexExcel = 3
+int indexExcel = 37
 int indexWriteResult = 1
 String temporaryNoteFirstInstance = "";
 List personIDs = [];
-// =========NEW=========Release
+// =========NEW=========Release 1045 SPC - Refactor the SPC reporting==============
 List lstIdResult = [];
 
 String strFirstInstance = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.endPointURLInstance1");
@@ -128,7 +133,7 @@ WritableSheet sheetResult = excelResult.getSheet(0);
 sheetResult.setName("Detailed")
 WritableSheet sheetSummary = excelResult.createSheet("Summary", 1);
 WritableSheet sheetPerformance = excelResult.createSheet("Performance", 2);
-// Add new sheet: Issue--------------------NEW---------------------------
+// Add new sheet: Issue-// =========NEW=========Release 1045 SPC - Refactor the SPC reporting==============
 WritableSheet sheetIssues = excelResult.createSheet("Issues", 3);
 
 //Format the Result and Summary sheet style
@@ -174,7 +179,7 @@ cell.setSize(5000);
 sheetSummary.setColumnView(4, cell);
 cell.setSize(35000);
 sheetSummary.setColumnView(5, cell);
-// -------------------NEW-----------
+// // =========NEW=========Release 1045 SPC - Refactor the SPC reporting==============
 cell.setSize(5000);
 sheetIssues.setColumnView(0, cell)
 cell.setSize(25000);
@@ -229,7 +234,7 @@ Label perfDataNameValue = null;
 Label perfElapsedTimeDetails = null;
 Label perfLegendHighlight = null
 
-//Write Issues information----------------------NEW---------------------------
+//Write Issues information-// =========NEW=========Release 1045 SPC - Refactor the SPC reporting==============
 Label issuefTestResult = new Label(0, 0, "Swiss Platform Consolidation - List Issues", cellFormatBold);
 Label issueID = new Label(0, 1, "ID", cellFormat);
 Label issueSubject = new Label(1, 1, "Subject", cellFormat);
@@ -288,7 +293,7 @@ sheetSummary.addCell(summaryNotes);
 sheetSummary.addCell(summaryTestCaseValue);
 sheetSummary.addCell(summaryEndTimeValue);
 sheetSummary.addCell(summaryTotalElapsedTimeValue);
-// Write some Issues labels ---------NEW---------------------
+// Write some Issues labels ---- =========NEW=========Release 1045 SPC - Refactor the SPC reporting==============
 sheetIssues.addCell(issuefTestResult);
 sheetIssues.addCell(issueID);
 sheetIssues.addCell(issueFirstInstance);
@@ -506,7 +511,7 @@ if (Arrays.asList(lstInstanceRequestID).contains(strInstance1ArticleRequestID) =
 }
 
 
-while (indexExcel <= 5)
+while (indexExcel <= 45)
 {
 	workbook = Workbook.getWorkbook(new File(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_testResults//" + "Test_Result_$testCase.name" + ".xls"),settings)
 	filePath = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_testResults//" + "Test_Result_$testCase.name" + ".xls"
@@ -698,8 +703,9 @@ while(indexRunner < wsdlTestSteps.size())
 
 	   temporaryList = mapResult.get("$testStepName")
         temporaryNoteFirstInstance = "Blocked at company \"$companyName\", line number $indexExcel, reason: \"$err1 get from the first instance \"$strFirstInstance\""
-
+        log.info("temporaryList in if(!validResponse) = " +  temporaryList.get(2) + 1 )
 	   int temporaryInt = temporaryList.get(2) + 1
+     log.info("temporaryList in if(!validResponse) = " + temporaryList.set(2, temporaryInt))
         temporaryList.set(2, temporaryInt);
 
         mapResult.put("$testStepName", temporaryList)
@@ -839,10 +845,13 @@ while(indexRunner < wsdlTestSteps.size())
 			   int temporaryInt;
 			   if(temporaryNoteFirstInstance == "")
 			   {
+              log.info("++++Increase Fail count due to temporaryList.get(2) + 1  in temporaryNoteFirstInstance+++++")
 			       temporaryInt = temporaryList.get(2) + 1
+             log.info("temporaryList at if(temporaryNoteFirstInstance) " + temporaryList.get(2) )
 			   }
 		        else
 		        {
+                log.info("Not Increase Fail count due to temporaryList.get(2) + 0  in temporaryNoteFirstInstance")
 		        	  temporaryInt = temporaryList.get(2) + 0
 		        }
 		        temporaryList.set(2, temporaryInt);
@@ -1094,11 +1103,11 @@ while(indexRunner < wsdlTestSteps.size())
                      }
                      else
                      {
-//                     	errCompare = getErrorMessageCompare(differences);
-//	                   log.error " ${text*9} Compare XML files - Result testing for testStep $testStepName : ------>>>>>> FAILED due to the missmatch error " + errCompare;
-//	                   temporaryList = mapResult.get("$testStepName")
-//	                   int temporaryInt = temporaryList.get(1) + 1
-//	                   temporaryList.set(1, temporaryInt);
+					errCompare = getErrorMessageCompare(differences);
+	                   log.error " ${text*9} Compare XML files - Result testing for testStep $testStepName : ------>>>>>> FAILED due to the missmatch error " + errCompare;
+	                   temporaryList = mapResult.get("$testStepName")
+	                   int temporaryInt = temporaryList.get(1) + 1
+	                   temporaryList.set(1, temporaryInt);
 //	                   String temporaryNoteOld = temporaryList.get(3).toString()
 //	                   String temporaryNoteNew = "*** Failed at company \"$companyName\", line number $indexExcel, reason: " + errCompare.toString() + "\n" + "\n"
 //	                   temporaryNoteReport = temporaryNoteOld + temporaryNoteNew
@@ -1109,57 +1118,52 @@ while(indexRunner < wsdlTestSteps.size())
 //	                   String testStepNoteFile = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "SPC_testResults" + "//" + "$testStepName" + "_Result_articleRequest_Details_Notes.txt"
 //				    errCompare = "Please refer to the TXT note file " + testStepNoteFile.replace("//", "/")
 
-				    // --------------------------NEW--------------------------
-//				    List nodeInExcel = [];
+
+				    // -=========NEW=========Release 1045 SPC - Refactor the SPC reporting==============
 				    Label cellResultsubject = null
-            			List listIssue = [];
+            int indexIssueExistedInListIssue = 0;
+            boolean isIssueExistedInListIssue = true
+            		    List listIssue = [];
 				    Label cellResultis1 = null
 				    Label cellResultis2 = null
 		            List listXpathInstance = new ArrayList<String>();
 		            List locationXMLFileOf2Instance = [];
 		            Label cellIdResult = null
 		            Label cellXpathNull = null
-//            int indexExcelSheetIssue = 1
-//            log.info("Start to collect ListIssue in SheetIssue Excel")
-//            while (!sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString().equals(""))
-//               {
-//                 if (sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString().equals(""))
-//                 {
-//                   break;
-//                 }
-//                 listIssue.add[sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString()]
-//               }
-        log.info("STAR DEBUGGING =================> ")
-        lstIdResult =[]
-        		log.info("listIDResult  at start " + lstIdResult.toString())
-  			int indexExcelSheetIssue = 2
-            int u = 0;
-            log.info("++++Start to collect ListIssue in SheetIssue Excel++++")
-            // at every row, check if they have data, then add to listIssue
-            while (!sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString().equals(""))
-               {
-
-                 log.info("Check row " + indexExcelSheetIssue + "status boolean is " + !sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString().equals(""))
-                 listIssue.add(sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString())
-              //   log.info("at row " + indexExcelSheetIssue + "listIssue is added " + listIssue.get[u])
-                 indexExcelSheetIssue++
-                 u++
-               }
-              // int idResult = listIssue.size();
-
-            log.info("++++List issue size is +++++" + listIssue.size())
+        			  log.info("STAR DEBUGGING =================> ")
+        			  lstIdResult =[]
+		        		log.info("listIDResult  at start " + lstIdResult.toString())
+		  			int indexExcelSheetIssue = 2
+		            int u = 0;
+		            log.info("++++Start to collect ListIssue in SheetIssue Excel++++")
+		            // At every row, check if they have data, then add to listIssue
+		            while (!sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString().equals(""))
+		               {
+		                 log.info("Check row " + indexExcelSheetIssue + "status boolean is " + !sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString().equals(""))
+		                 listIssue.add(sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString())
+		                 indexExcelSheetIssue++
+		                 u++
+		               }
+		            log.info("++++List issue size is +++++" + listIssue.size())
+		            // ==============REFACTOR GET SUBJECT/XPATH1/XPATH2===============
 				    for(int j = 0; j <= differences.size()-1; j++)
 				    {
-                    			String issue = differences.get(j);
-        						log.info("issuee-----------------" + issue);
-        						String subject = issue.substring(0, issue.indexOf('at '));
-        						log.info("subject--------" + subject)
-        						String xpathInstance1
-        						String xpathInstance2
-	        					String tempxpathInstance1 = issue.substring(issue.indexOf(' at '), issue.indexOf(" to ", issue.indexOf(' at ')));
-//        						String tempxpathInstance1 = issue.substring(issue.indexOf(' at'), issue.lastIndexOf('at ')).substring("]".indexOf("]"));
-        						String tempxpathInstance2 = issue.substring(issue.lastIndexOf(' at ')).substring("]".indexOf("]"));
-        						if (tempxpathInstance1.contains('null'))
+				    	Difference difference;
+	    				difference = differences.get(j);
+				    	if(!difference.isRecoverable())
+				    	{
+              if(!difference.getDescription().equalsIgnoreCase("number of child nodes") && !difference.getDescription().equalsIgnoreCase("sequence of child nodes"))
+              {
+				    		String issue = differences.get(j);
+						String subject = issue.substring(0, issue.indexOf('at '));
+						log.info("issuee-----------------" + issue);
+						String xpathInstance1
+        					String xpathInstance2
+						String tempxpathInstance1 = differences.get(j).getControlNodeDetail().getXpathLocation();
+        					String tempxpathInstance2 = differences.get(j).getTestNodeDetail().getXpathLocation();
+        					log.info("tempxpathInstance2 ==== " + tempxpathInstance2)
+
+        						if (tempxpathInstance1 == null)
         						{
         							 xpathInstance1 = "null";
         						}
@@ -1176,7 +1180,7 @@ while(indexRunner < wsdlTestSteps.size())
         						}
 
         						log.info("instance1 ===========" + xpathInstance1);
-        						if (tempxpathInstance2.contains("null"))
+        						if (tempxpathInstance2 == null)
         						{
         							 xpathInstance2 = "null";
         						}
@@ -1192,6 +1196,7 @@ while(indexRunner < wsdlTestSteps.size())
 	        						}
         						}
         						log.info("instance2 ===========" + xpathInstance2);
+
                     // add instance 1 xpath and instance 2 xpath to listXpath
                     if (listXpathInstance.size() > 0)
                     {
@@ -1203,8 +1208,7 @@ while(indexRunner < wsdlTestSteps.size())
                       listXpathInstance.add(0,xpathInstance1)
                       listXpathInstance.add(1,xpathInstance2)
                     }
-//        						nodeInExcel.add(subject);
-            //Compare current subject, if already existed then throw it, if not add to listIssue
+            		//Compare current subject, if already existed then throw it, if not add to listIssue
                     if(listIssue.size() == 0)
                     {
                       listIssue.add(subject);
@@ -1212,8 +1216,6 @@ while(indexRunner < wsdlTestSteps.size())
                     else
                     {
                         log.info("============= Start check if subject already existed in listIssue ==========================")
-                        boolean isIssueExistedInListIssue = true
-                        int indexIssueExistedInListIssue = 0;
                           for (int n = 0; n < listIssue.size(); n++ )
                           {
                             log.info(" --------- Comparing between new issue " + subject + " with listIssue at index " + n + " " + listIssue.get(n))
@@ -1223,14 +1225,29 @@ while(indexRunner < wsdlTestSteps.size())
                                   indexIssueExistedInListIssue = n
                                   log.info("..... this issue  " + subject + " already existed in listIssue at index " + n + ".......")
                                   log.info(".... Issue in listIssue at index " + n + " is " + listIssue.get(n))
-                                  lstIdResult.add(indexIssueExistedInListIssue + 1 )
-                                  break
+                                  indexIssueExistedInListIssue = indexIssueExistedInListIssue + 1
+                                  // ======================Check duplicate Id in lstIdResult 09 August 2018==============
+                    							boolean isIdExistedInLstId = false
+                    							for(int indexId = 0; indexId < lstIdResult.size(); indexId++)
+                    							{
+                      								if(indexIssueExistedInListIssue == lstIdResult.get(indexId))
+                      									{
+                      										isIdExistedInLstId = true
+                      									}
+                    							}
+                    					  	if (isIdExistedInLstId == false)
+                    								{
+                    										lstIdResult.add(indexIssueExistedInListIssue)
+                    								}
+
+                                   break
                             }
                             isIssueExistedInListIssue = false
+                            listIssue.add(subject)
                           }
-                              if(isIssueExistedInListIssue == false)
+                      }
+                              if(isIssueExistedInListIssue == false || listIssue.size() == 1)
                               {
-                                listIssue.add(subject)
                                 log.info("..... this issue  " + subject + " is added to the list ..........")
                                 if (locationXMLFileOf2Instance.size() > 0)
                                 {
@@ -1242,8 +1259,6 @@ while(indexRunner < wsdlTestSteps.size())
                                     locationXMLFileOf2Instance.add(0,temporaryXmlFile)
                                     locationXMLFileOf2Instance.add(1,temporaryXmlFile2)
                                 }
-                  				     // File inputFile1 = new File(temporaryXmlFile)
-                  				     // File inputFile2 = new File(temporaryXmlFile2)
               				          int collumnIndexToWriteIssue2Instance = 2
                                 log.info("=======Start finding Cell index which doesn't have data yet=======")
                                 int IndexIssueExcel = 2
@@ -1262,11 +1277,7 @@ while(indexRunner < wsdlTestSteps.size())
 
                                             cellIdResult = new Label(0, IndexIssueExcel, idResult);
                                             cellResultsubject = new Label(1, IndexIssueExcel,subject);
-                                            //cellResultis1 = new Label(2, IndexIssueExcel,xpathInstance1);
-                                            //cellResultis2 = new Label(3, IndexIssueExcel,xpathInstance2);
                                             sheetIssues.addCell(cellResultsubject)
-                                                                //sheetIssues.addCell(cellResultis1)
-                                                                //sheetIssues.addCell(cellResultis2)
                                             // Add ID into ID coloumn in sheet Issues
                                             sheetIssues.addCell(cellIdResult)
                                             // Add ID of issue Into list issue.
@@ -1275,8 +1286,6 @@ while(indexRunner < wsdlTestSteps.size())
                                             log.info("instance" + w +  " in listXpathInstance xpath is " + listXpathInstance.get(w))
                                             if (listXpathInstance.get(w).equals("null"))
                                             {
-//                                                  cellXpathNull = new Label(collumnIndexToWriteIssue2Instance, IndexIssueExcel, "null")
-//                                                  collumnIndexToWriteIssue2Instance++
                                                   log.info("start write null to collumn " + collumnIndexToWriteIssue2Instance)
                                                   cellXpathNull = new Label(collumnIndexToWriteIssue2Instance, IndexIssueExcel, "null")
                                                   sheetIssues.addCell(cellXpathNull)
@@ -1293,7 +1302,6 @@ while(indexRunner < wsdlTestSteps.size())
                                             DocumentBuilder dBuilder
                                             dBuilder = dbFactory.newDocumentBuilder()
                                             Document doc = dBuilder.parse(inputFile)
-                                            log.info("doc " + w + " " + doc)
                                             XPath xPath =  XPathFactory.newInstance().newXPath()
                                             String expression = "/" + listXpathInstance.get(w)
                                             log.info("xpath expression " + w + " " + expression)
@@ -1301,36 +1309,36 @@ while(indexRunner < wsdlTestSteps.size())
                                             Document newXmlDocument = DocumentBuilderFactory.newInstance()
                                                     .newDocumentBuilder().newDocument();
                                             Element root = newXmlDocument.createElement("root")
-                                            log.info("root " + w + " " + root)
                                             newXmlDocument.appendChild(root);
                                             for (int i = 0; i < nodeList.getLength(); i++)
                                              {
                                                 org.w3c.dom.Node node = nodeList.item(i);
-                                                log.info("node " + i + " " + node)
                                                 org.w3c.dom.Node copyNode = newXmlDocument.importNode(node, true)
-                                                log.info("copyNode " + i + " " + copyNode)
                                                 root.appendChild(copyNode)
                                              }
                                               // Write XML issue to Excel
-//                                              log.info()
-                                              //def printXmlDocument(org.w3c.dom.Document document, WritableSheet sheetIssues, WritableCellFormat cellFormat, int indexExcelToWriteData, int Collumn)
                                              printXmlDocument(newXmlDocument,sheetIssues, cellFormat, IndexIssueExcel, collumnIndexToWriteIssue2Instance);
                                              collumnIndexToWriteIssue2Instance++
                                             }
                                 }
                       }
-//                      else
-//                      {
-//                        lstIdResult.add("" + indexIssueExistedInListIssue);
-//                      }
-              }
+              //}
               //log check listIssue
               log.info("***** Check list issue data******")
               for(int indexListIssue = 0; indexListIssue < listIssue.size(); indexListIssue++ )
                 {
                   log.info("Data at index " + indexListIssue + " is " + listIssue.get(indexListIssue))
                 }
+                }
             }
+	}
+
+
+
+
+
+
+        			// =================== END REFACTORING=======================
           }
 }
             	else
@@ -1355,10 +1363,7 @@ while(indexRunner < wsdlTestSteps.size())
 	    }
 	    if(strFileCompareTestResult == "BLOCKED")
 	    {
-	    	    //Write notes to the external txt file - Fixed for the maximum characters of Excel cell
-	    		// String testStepNoteFile = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "SPC_testResults" + "//" + "$testStepName" + "_Result_articleRequest_Details_Notes.txt"
-	    		// cellResultNotes = new Label(indexHeaderResult + 1, indexExcel, "Please refer to the TXT note file " + testStepNoteFile.replace("//", "/"));
-          // --------------- NEW----------------
+          // ---=========NEW=========Release 1045 SPC - Refactor the SPC reporting==============
           	cellResultNotes = new Label(indexHeaderResult + 1, indexExcel, "Blocked at company \"$companyName\", line number $indexExcel, reason: \"$err1 get from the first instance \"$strFirstInstance\"");
 	    }
           if(strFileCompareTestResult == "FAILED")
@@ -1556,7 +1561,6 @@ while(temporaryIntForMap < wsdlTestSteps.size())
     perfTestSteps =  new Label(0, indexTempRowReportSummaryOfTestStep, "$testStepName", cellFormat)
     sheetSummary.addCell(summaryTestSteps);
     sheetPerformance.addCell(perfTestSteps);
-
 	List listTestResultOutput = mapResult.get("$testStepName")
 	String noPass = listTestResultOutput.get(0).toString()
 	int intnoPass = listTestResultOutput.get(0)
@@ -1626,10 +1630,11 @@ while(temporaryIntForMap < wsdlTestSteps.size())
     else
     {
     	    //Write notes to the external txt file - Fixed for the maximum characters of Excel cell
-    		String testStepNoteFile = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "SPC_testResults" + "//" + "$testStepName" + "_Result_articleRequest_Details_Notes.txt"
-    		File fileNote = new File(testStepNoteFile)
-    		fileNote.write(detectedNote);
-    		summaryNoteValue = new Label(5, indexTempRowReportSummaryOfTestStep, "Please refer to the TXT note file " + testStepNoteFile.replace("//", "/"), cellFormat);
+//    		String testStepNoteFile = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "SPC_testResults" + "//" + "$testStepName" + "_Result_articleRequest_Details_Notes.txt"
+//    		File fileNote = new File(testStepNoteFile)
+//    		fileNote.write(detectedNote);
+//    		summaryNoteValue = new Label(5, indexTempRowReportSummaryOfTestStep, "Please refer to the TXT note file " + testStepNoteFile.replace("//", "/"), cellFormat);
+    		summaryNoteValue = new Label(5, indexTempRowReportSummaryOfTestStep, "Please refer to sheet 'Detailed' for more detail", cellFormat);
     }
     sheetSummary.addCell(summaryNoteValue);
 
@@ -1880,16 +1885,3 @@ String printNode(org.w3c.dom.Node nodeInput)
          }
          return output;
         }
-
-//         def printXmlDocument(org.w3c.dom.Document document,WritableSheet sheetIssues)
-//         {
-//            DOMImplementationLS domImplementationLS = (DOMImplementationLS) document
-//                .getImplementation();
-//            LSSerializer lsSerializer = domImplementationLS.createLSSerializer();
-//             String string = lsSerializer.writeToString(document);
-//             log.info("Print xml document is      " + string)
-////             Label cellResultNotesHai = null;
-////             cellResultNotesHai = new Label(5, 5, string);
-//			cellResultNotesHai = new Label(5, 5, "linh xinh dep");
-//             sheetIssues.addCell(cellResultNotesHai);
-//          }
