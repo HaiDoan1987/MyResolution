@@ -53,8 +53,13 @@ import org.w3c.dom.ls.LSSerializer;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import java.lang.Object
+import org.custommonkey.xmlunit.Difference
+//import org.custommonkey.xmlunit
 
 
+import groovy.xml.XmlUtil
+import org.custommonkey.xmlunit.*
 
 
 
@@ -89,11 +94,11 @@ def projectPath = groovyUtils.projectPath;
 def testCase = testRunner.testCase;
 text = "~"
 star = "*";
-int indexExcel = 3
+int indexExcel = 37
 int indexWriteResult = 1
 String temporaryNoteFirstInstance = "";
 List personIDs = [];
-// New Linh Vương
+// =========NEW=========Release 1045 SPC - Refactor the SPC reporting==============
 List lstIdResult = [];
 
 String strFirstInstance = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.endPointURLInstance1");
@@ -128,7 +133,7 @@ WritableSheet sheetResult = excelResult.getSheet(0);
 sheetResult.setName("Detailed")
 WritableSheet sheetSummary = excelResult.createSheet("Summary", 1);
 WritableSheet sheetPerformance = excelResult.createSheet("Performance", 2);
-// Add new sheet: Issue--------------------NEW---------------------------
+// Add new sheet: Issue-// =========NEW=========Release 1045 SPC - Refactor the SPC reporting==============
 WritableSheet sheetIssues = excelResult.createSheet("Issues", 3);
 
 //Format the Result and Summary sheet style
@@ -150,7 +155,7 @@ cellFormatHighlight.setBorder(jxl.format.Border.ALL, jxl.format.BorderLineStyle.
 def strbackgroundHighlightColor = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("backgroundHighlightColor")
 if(strbackgroundHighlightColor == "")
 {
-	strbackgroundHighlightColor = "WHITE"
+  strbackgroundHighlightColor = "WHITE"
 }
 cellFormatHighlight.setBackground(Colour."$strbackgroundHighlightColor");
 
@@ -174,7 +179,7 @@ cell.setSize(5000);
 sheetSummary.setColumnView(4, cell);
 cell.setSize(35000);
 sheetSummary.setColumnView(5, cell);
-// -------------------NEW-----------
+// // =========NEW=========Release 1045 SPC - Refactor the SPC reporting==============
 cell.setSize(5000);
 sheetIssues.setColumnView(0, cell)
 cell.setSize(25000);
@@ -229,7 +234,7 @@ Label perfDataNameValue = null;
 Label perfElapsedTimeDetails = null;
 Label perfLegendHighlight = null
 
-//Write Issues information----------------------NEW---------------------------
+//Write Issues information-// =========NEW=========Release 1045 SPC - Refactor the SPC reporting==============
 Label issuefTestResult = new Label(0, 0, "Swiss Platform Consolidation - List Issues", cellFormatBold);
 Label issueID = new Label(0, 1, "ID", cellFormat);
 Label issueSubject = new Label(1, 1, "Subject", cellFormat);
@@ -240,13 +245,13 @@ Label issueSecondInstance = new Label(3, 1, "Second Instance", cellFormat);
 
 if(intLimitOfDifferentPercentage == "")
 {
-	intLimitOfDifferentPercentage = 0
-	perfLegendHighlight = new Label(5, 0, "", cellFormat);
+  intLimitOfDifferentPercentage = 0
+  perfLegendHighlight = new Label(5, 0, "", cellFormat);
 }
 else
 {
-	intLimitOfDifferentPercentage = intLimitOfDifferentPercentage.toInteger()
-	perfLegendHighlight = new Label(5, 0, "The difference percentage is greater than " + intLimitOfDifferentPercentage + " %", cellFormatHighlight);
+  intLimitOfDifferentPercentage = intLimitOfDifferentPercentage.toInteger()
+  perfLegendHighlight = new Label(5, 0, "The difference percentage is greater than " + intLimitOfDifferentPercentage + " %", cellFormatHighlight);
 }
 
 log.info " ${star*400}";
@@ -254,7 +259,7 @@ log.info " ${text*3} Start testing for test Case: $testCase.name"
 
 if(strbackgroundHighlightColor == "WHITE")
 {
-	perfLegendHighlight = new Label(5, 0, "");
+  perfLegendHighlight = new Label(5, 0, "");
 }
 
 // Write some Performance labels
@@ -288,7 +293,7 @@ sheetSummary.addCell(summaryNotes);
 sheetSummary.addCell(summaryTestCaseValue);
 sheetSummary.addCell(summaryEndTimeValue);
 sheetSummary.addCell(summaryTotalElapsedTimeValue);
-// Write some Issues labels ---------NEW---------------------
+// Write some Issues labels ---- =========NEW=========Release 1045 SPC - Refactor the SPC reporting==============
 sheetIssues.addCell(issuefTestResult);
 sheetIssues.addCell(issueID);
 sheetIssues.addCell(issueFirstInstance);
@@ -367,30 +372,30 @@ Label cellCRIFIDCoreDBTestDataPerson = null;
 
 if (flagRetrievedPerson == "true")
 {
-	workbookTestDataPerson = Workbook.createWorkbook(new File(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.path.person")), settings);
-	sheetTestDataPerson = workbookTestDataPerson.createSheet("SheetTest", 0);
-	// Write the headers
-	Label cellIDHeaderTestDataPerson = new Label(0, 0, "OFWI_ID");
-	Label cellLastNameHeaderTestDataPerson = new Label(1, 0, "PERSON_FIRSTNAME");
-	Label cellFirstNameHeaderTestDataPerson = new Label(2, 0, "PERSON_LASTNAME");
-	Label cellStreetHeaderTestDataPerson = new Label(3, 0, "PERSON_STREET");
-	Label cellHouseNumberHeaderTestDataPerson = new Label(4, 0, "HOUSE_NUMBER");
-	Label cellCityHeaderTestDataPerson = new Label(5, 0, "CITY");
-	Label cellZipCodeHeaderTestDataPerson = new Label(6, 0, "ZIPCODE");
-	Label cellCountryHeaderTestDataPerson = new Label(7, 0, "COUNTRY");
-	Label cellTDKeyHeaderTestDataPerson = new Label(8, 0, "TD_KEY");
-	Label cellCRIFIDCoreDBHeaderTestDataPerson = new Label(9, 0, "CRIFID_COREDB");
+  workbookTestDataPerson = Workbook.createWorkbook(new File(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.path.person")), settings);
+  sheetTestDataPerson = workbookTestDataPerson.createSheet("SheetTest", 0);
+  // Write the headers
+  Label cellIDHeaderTestDataPerson = new Label(0, 0, "OFWI_ID");
+  Label cellLastNameHeaderTestDataPerson = new Label(1, 0, "PERSON_FIRSTNAME");
+  Label cellFirstNameHeaderTestDataPerson = new Label(2, 0, "PERSON_LASTNAME");
+  Label cellStreetHeaderTestDataPerson = new Label(3, 0, "PERSON_STREET");
+  Label cellHouseNumberHeaderTestDataPerson = new Label(4, 0, "HOUSE_NUMBER");
+  Label cellCityHeaderTestDataPerson = new Label(5, 0, "CITY");
+  Label cellZipCodeHeaderTestDataPerson = new Label(6, 0, "ZIPCODE");
+  Label cellCountryHeaderTestDataPerson = new Label(7, 0, "COUNTRY");
+  Label cellTDKeyHeaderTestDataPerson = new Label(8, 0, "TD_KEY");
+  Label cellCRIFIDCoreDBHeaderTestDataPerson = new Label(9, 0, "CRIFID_COREDB");
 
-	sheetTestDataPerson.addCell(cellIDHeaderTestDataPerson);
-	sheetTestDataPerson.addCell(cellFirstNameHeaderTestDataPerson);
-	sheetTestDataPerson.addCell(cellLastNameHeaderTestDataPerson);
-	sheetTestDataPerson.addCell(cellStreetHeaderTestDataPerson);
-	sheetTestDataPerson.addCell(cellHouseNumberHeaderTestDataPerson);
-	sheetTestDataPerson.addCell(cellCityHeaderTestDataPerson);
-	sheetTestDataPerson.addCell(cellZipCodeHeaderTestDataPerson);
-	sheetTestDataPerson.addCell(cellCountryHeaderTestDataPerson);
-	sheetTestDataPerson.addCell(cellTDKeyHeaderTestDataPerson);
-	sheetTestDataPerson.addCell(cellCRIFIDCoreDBHeaderTestDataPerson);
+  sheetTestDataPerson.addCell(cellIDHeaderTestDataPerson);
+  sheetTestDataPerson.addCell(cellFirstNameHeaderTestDataPerson);
+  sheetTestDataPerson.addCell(cellLastNameHeaderTestDataPerson);
+  sheetTestDataPerson.addCell(cellStreetHeaderTestDataPerson);
+  sheetTestDataPerson.addCell(cellHouseNumberHeaderTestDataPerson);
+  sheetTestDataPerson.addCell(cellCityHeaderTestDataPerson);
+  sheetTestDataPerson.addCell(cellZipCodeHeaderTestDataPerson);
+  sheetTestDataPerson.addCell(cellCountryHeaderTestDataPerson);
+  sheetTestDataPerson.addCell(cellTDKeyHeaderTestDataPerson);
+  sheetTestDataPerson.addCell(cellCRIFIDCoreDBHeaderTestDataPerson);
 }
 List listNameSteps = [];
 
@@ -409,114 +414,114 @@ int companyCRIFIDCoreDBColumn = 0;
 
 for (int k = 0; k < columnTitle.size(); k++)
 {
-	if (columnTitle[k].getContents().equals("OFWI_ID"))
-	{
-		companyOFWIIDColumn = columnTitle[k].getColumn();
-		flagOFWIID = true;
-	}
-	if (columnTitle[k].getContents().equals("COMPANY_NAME"))
-	{
-		companyNameColumn = columnTitle[k].getColumn();
-	}
-	if (columnTitle[k].getContents().equals("TD_KEY"))
-	{
-		companyTDKeyColumn = columnTitle[k].getColumn();
-		flagTDKEY = true;
-	}
-	if (columnTitle[k].getContents().equals("CRIFID_COREDB"))
-	{
-		companyCRIFIDCoreDBColumn = columnTitle[k].getColumn();
-		flagCRIFIDCOREDB = true;
-	}
+  if (columnTitle[k].getContents().equals("OFWI_ID"))
+  {
+    companyOFWIIDColumn = columnTitle[k].getColumn();
+    flagOFWIID = true;
+  }
+  if (columnTitle[k].getContents().equals("COMPANY_NAME"))
+  {
+    companyNameColumn = columnTitle[k].getColumn();
+  }
+  if (columnTitle[k].getContents().equals("TD_KEY"))
+  {
+    companyTDKeyColumn = columnTitle[k].getColumn();
+    flagTDKEY = true;
+  }
+  if (columnTitle[k].getContents().equals("CRIFID_COREDB"))
+  {
+    companyCRIFIDCoreDBColumn = columnTitle[k].getColumn();
+    flagCRIFIDCOREDB = true;
+  }
 }
 
 def alert = com.eviware.soapui.support.UISupport;
 
 if (flagTDKEY == false)
 {
-	if (strInstance1ArticleRequestID == "TD_KEY" && strInstance2ArticleRequestID == "TD_KEY")
-	{
-		alert.showErrorMessage("Both instances use TD_KEY but the Excel file is missing TD_KEY column. Please check again!")
-		testRunner.cancel("Missing TD_KEY column in Excel file")
-		return null
-	}
-	else if (strInstance1ArticleRequestID == "TD_KEY" && strInstance2ArticleRequestID != "TD_KEY")
-	{
-		alert.showErrorMessage("Instance 1 uses TD_KEY but the Excel file is missing TD_KEY column. Please check again!")
-		testRunner.cancel("Missing TD_KEY column in Excel file")
-		return null
-	}
-	else if (strInstance1ArticleRequestID != "TD_KEY" && strInstance2ArticleRequestID == "TD_KEY")
-	{
-		alert.showErrorMessage("Instance 2 uses TD_KEY but the Excel file is missing TD_KEY column. Please check again!")
-		testRunner.cancel("Missing TD_KEY column in Excel file")
-		return null
-	}
+  if (strInstance1ArticleRequestID == "TD_KEY" && strInstance2ArticleRequestID == "TD_KEY")
+  {
+    alert.showErrorMessage("Both instances use TD_KEY but the Excel file is missing TD_KEY column. Please check again!")
+    testRunner.cancel("Missing TD_KEY column in Excel file")
+    return null
+  }
+  else if (strInstance1ArticleRequestID == "TD_KEY" && strInstance2ArticleRequestID != "TD_KEY")
+  {
+    alert.showErrorMessage("Instance 1 uses TD_KEY but the Excel file is missing TD_KEY column. Please check again!")
+    testRunner.cancel("Missing TD_KEY column in Excel file")
+    return null
+  }
+  else if (strInstance1ArticleRequestID != "TD_KEY" && strInstance2ArticleRequestID == "TD_KEY")
+  {
+    alert.showErrorMessage("Instance 2 uses TD_KEY but the Excel file is missing TD_KEY column. Please check again!")
+    testRunner.cancel("Missing TD_KEY column in Excel file")
+    return null
+  }
 }
 
 if (flagCRIFIDCOREDB == false)
 {
-	if (strInstance1ArticleRequestID == "CRIFID_COREDB" && strInstance2ArticleRequestID == "CRIFID_COREDB")
-	{
-		alert.showErrorMessage("Both instances use CRIFID_COREDB but the Excel file is missing CRIFID_COREDB column. Please check again!")
-		testRunner.cancel("Missing CRIFID_COREDB column in Excel file")
-		return null
-	}
-	else if (strInstance1ArticleRequestID == "CRIFID_COREDB" && strInstance2ArticleRequestID != "CRIFID_COREDB")
-	{
-		alert.showErrorMessage("Instance 1 uses CRIFID_COREDB but the Excel file is missing CRIFID_COREDB column. Please check again!")
-		testRunner.cancel("Missing CRIFID_COREDB column in Excel file")
-		return null
-	}
-	else if (strInstance1ArticleRequestID != "CRIFID_COREDB" && strInstance2ArticleRequestID == "CRIFID_COREDB")
-	{
-		alert.showErrorMessage("Instance 2 uses CRIFID_COREDB but the Excel file is missing CRIFID_COREDB column. Please check again!")
-		testRunner.cancel("Missing CRIFID_COREDB column in Excel file")
-		return null
-	}
+  if (strInstance1ArticleRequestID == "CRIFID_COREDB" && strInstance2ArticleRequestID == "CRIFID_COREDB")
+  {
+    alert.showErrorMessage("Both instances use CRIFID_COREDB but the Excel file is missing CRIFID_COREDB column. Please check again!")
+    testRunner.cancel("Missing CRIFID_COREDB column in Excel file")
+    return null
+  }
+  else if (strInstance1ArticleRequestID == "CRIFID_COREDB" && strInstance2ArticleRequestID != "CRIFID_COREDB")
+  {
+    alert.showErrorMessage("Instance 1 uses CRIFID_COREDB but the Excel file is missing CRIFID_COREDB column. Please check again!")
+    testRunner.cancel("Missing CRIFID_COREDB column in Excel file")
+    return null
+  }
+  else if (strInstance1ArticleRequestID != "CRIFID_COREDB" && strInstance2ArticleRequestID == "CRIFID_COREDB")
+  {
+    alert.showErrorMessage("Instance 2 uses CRIFID_COREDB but the Excel file is missing CRIFID_COREDB column. Please check again!")
+    testRunner.cancel("Missing CRIFID_COREDB column in Excel file")
+    return null
+  }
 }
 
 if (flagOFWIID == false)
 {
-	if (strInstance1ArticleRequestID == "OFWI_ID" && strInstance2ArticleRequestID == "OFWI_ID")
-	{
-		alert.showErrorMessage("Both instances use OFWI_ID but the Excel file is missing OFWI_ID column. Please check again!")
-		testRunner.cancel("Missing OFWI_ID column in Excel file")
-		return null
-	}
-	else if (strInstance1ArticleRequestID == "OFWI_ID" && strInstance2ArticleRequestID != "OFWI_ID")
-	{
-		alert.showErrorMessage("Instance 1 uses OFWI_ID but the Excel file is missing OFWI_ID column. Please check again!")
-		testRunner.cancel("Missing OFWI_ID column in Excel file")
-		return null
-	}
-	else if (strInstance1ArticleRequestID != "OFWI_ID" && strInstance2ArticleRequestID == "OFWI_ID")
-	{
-		alert.showErrorMessage("Instance 2 uses OFWI_ID but the Excel file is missing OFWI_ID column. Please check again!")
-		testRunner.cancel("Missing OFWI_ID column in Excel file")
-		return null
-	}
+  if (strInstance1ArticleRequestID == "OFWI_ID" && strInstance2ArticleRequestID == "OFWI_ID")
+  {
+    alert.showErrorMessage("Both instances use OFWI_ID but the Excel file is missing OFWI_ID column. Please check again!")
+    testRunner.cancel("Missing OFWI_ID column in Excel file")
+    return null
+  }
+  else if (strInstance1ArticleRequestID == "OFWI_ID" && strInstance2ArticleRequestID != "OFWI_ID")
+  {
+    alert.showErrorMessage("Instance 1 uses OFWI_ID but the Excel file is missing OFWI_ID column. Please check again!")
+    testRunner.cancel("Missing OFWI_ID column in Excel file")
+    return null
+  }
+  else if (strInstance1ArticleRequestID != "OFWI_ID" && strInstance2ArticleRequestID == "OFWI_ID")
+  {
+    alert.showErrorMessage("Instance 2 uses OFWI_ID but the Excel file is missing OFWI_ID column. Please check again!")
+    testRunner.cancel("Missing OFWI_ID column in Excel file")
+    return null
+  }
 }
 
 if (Arrays.asList(lstInstanceRequestID).contains(strInstance1ArticleRequestID) == false || Arrays.asList(lstInstanceRequestID).contains(strInstance2ArticleRequestID) == false)
 {
-	alert.showErrorMessage("Invalid property name in instances. Please input OFWI_ID, TD_KEY or CRIFID_COREDB for instances!")
-	testRunner.cancel("Invalid property name in instances")
-	return null
+  alert.showErrorMessage("Invalid property name in instances. Please input OFWI_ID, TD_KEY or CRIFID_COREDB for instances!")
+  testRunner.cancel("Invalid property name in instances")
+  return null
 }
 
 
-while (indexExcel <= 6)
+while (indexExcel <= 45)
 {
-	workbook = Workbook.getWorkbook(new File(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_testResults//" + "Test_Result_$testCase.name" + ".xls"),settings)
-	filePath = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_testResults//" + "Test_Result_$testCase.name" + ".xls"
-	f = new File(filePath)
+  workbook = Workbook.getWorkbook(new File(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_testResults//" + "Test_Result_$testCase.name" + ".xls"),settings)
+  filePath = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_testResults//" + "Test_Result_$testCase.name" + ".xls"
+  f = new File(filePath)
 
-	excelResult = Workbook.createWorkbook(new File(filePath), workbook);
-	sheetResult = excelResult.getSheet(0);
-	sheetSummary = excelResult.getSheet(1);
-	sheetPerformance = excelResult.getSheet(2);
-	sheetIssues = excelResult.getSheet(3);
+  excelResult = Workbook.createWorkbook(new File(filePath), workbook);
+  sheetResult = excelResult.getSheet(0);
+  sheetSummary = excelResult.getSheet(1);
+  sheetPerformance = excelResult.getSheet(2);
+  sheetIssues = excelResult.getSheet(3);
 
 // Set property for Company OFWI-ID
 Cell companyOFWIIDExcel = sheet.getCell(companyOFWIIDColumn,indexExcel) // getCell(column,row)
@@ -545,14 +550,14 @@ int companyIDI1Column = 0
 int companyIDI2Column = 0
 for (int l = 0; l < columnTitle.size(); l++)
 {
-	if (columnTitle[l].getContents().equals(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.instance1ArticleRequestID")))
-	{
-		companyIDI1Column = columnTitle[l].getColumn();
-	}
-	if (columnTitle[l].getContents().equals(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.instance2ArticleRequestID")))
-	{
-		companyIDI2Column = columnTitle[l].getColumn();
-	}
+  if (columnTitle[l].getContents().equals(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.instance1ArticleRequestID")))
+  {
+    companyIDI1Column = columnTitle[l].getColumn();
+  }
+  if (columnTitle[l].getContents().equals(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.instance2ArticleRequestID")))
+  {
+    companyIDI2Column = columnTitle[l].getColumn();
+  }
 }
 
 Cell companyIDI1Excel = sheet.getCell(companyIDI1Column,indexExcel) // getCell(column,row)
@@ -572,10 +577,10 @@ while(indexRunner < wsdlTestSteps.size())
     // Get current test step Name
     testStep = wsdlTestSteps.get(indexRunner);
     testStepName = testStep.name;
-	if (!listNameSteps.contains(testStepName))
-	{
-		listNameSteps.add(testStepName);
-	}
+  if (!listNameSteps.contains(testStepName))
+  {
+    listNameSteps.add(testStepName);
+  }
     headerResult = new Label(indexHeaderResult, 0, "$testStepName" + " RESULT");
     headerResultNotes = new Label(indexHeaderResult + 1, 0, "$testStepName" + " NOTES");
     sheetResult.addCell(headerResult);
@@ -592,23 +597,23 @@ while(indexRunner < wsdlTestSteps.size())
     Date startStep1st = new Date()
     long lStartStep1st = startStep1st.getTime();
 
-	if (strInstance1ArticleRequestID == "TD_KEY")
-	{
-		com.eviware.soapui.SoapUI.globalProperties.setPropertyValue("companyNoID", companyTDKey);
-	}
-	else if (strInstance1ArticleRequestID == "OFWI_ID")
-	{
-		com.eviware.soapui.SoapUI.globalProperties.setPropertyValue("companyNoID", companyOFWIID);
-	}
-	else if (strInstance1ArticleRequestID == "CRIFID_COREDB")
-	{
-		com.eviware.soapui.SoapUI.globalProperties.setPropertyValue("companyNoID", companyCRIFIDCoreDB);
-	}
+  if (strInstance1ArticleRequestID == "TD_KEY")
+  {
+    com.eviware.soapui.SoapUI.globalProperties.setPropertyValue("companyNoID", companyTDKey);
+  }
+  else if (strInstance1ArticleRequestID == "OFWI_ID")
+  {
+    com.eviware.soapui.SoapUI.globalProperties.setPropertyValue("companyNoID", companyOFWIID);
+  }
+  else if (strInstance1ArticleRequestID == "CRIFID_COREDB")
+  {
+    com.eviware.soapui.SoapUI.globalProperties.setPropertyValue("companyNoID", companyCRIFIDCoreDB);
+  }
 
-	// Run the test request for the first instance
+  // Run the test request for the first instance
     log.info " ${text*6} Start testing for test Step: $testStepName for company  TD no " + companyTDKey + " at Excel data line # " +  indexExcel;
     log.info " ${text*9} Running request to the first instance URL " + strFirstInstance +" with company number ID: " + com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("companyNoID");
-	testRunner.runTestStepByName("$testStepName");
+  testRunner.runTestStepByName("$testStepName");
 
     // Trace the end time
     Date endStep1st = new Date()
@@ -616,22 +621,22 @@ while(indexRunner < wsdlTestSteps.size())
     long diffPerfElapsedTimeStep1st = lEndStep1st - lStartStep1st;
     long temporaryPerfElapsedTimeStep1st = diffPerfElapsedTimeStep1st;
 
-		// Calculate the elapsed time for the first instance
-		long secondInMillisStep1st = 1000;
-		long minuteInMillisStep1st = secondInMillisStep1st * 60;
-		long hourInMillisStep1st = minuteInMillisStep1st * 60;
-		long dayInMillisStep1st = hourInMillisStep1st * 24;
-		long elapsedDaysStep1st = temporaryPerfElapsedTimeStep1st / dayInMillisStep1st;
-		temporaryPerfElapsedTimeStep1st = temporaryPerfElapsedTimeStep1st % dayInMillisStep1st;
-		long elapsedHoursStep1st = temporaryPerfElapsedTimeStep1st / hourInMillisStep1st;
-		temporaryPerfElapsedTimeStep1st = temporaryPerfElapsedTimeStep1st % hourInMillisStep1st;
-		long elapsedMinutesStep1st = temporaryPerfElapsedTimeStep1st / minuteInMillisStep1st;
-		temporaryPerfElapsedTimeStep1st = temporaryPerfElapsedTimeStep1st % minuteInMillisStep1st;
-		long elapsedSecondsStep1st = temporaryPerfElapsedTimeStep1st / secondInMillisStep1st;
-		temporaryPerfElapsedTimeStep1st = temporaryPerfElapsedTimeStep1st % secondInMillisStep1st;
-		long elapsedMilliSecondsStep1st = temporaryPerfElapsedTimeStep1st % secondInMillisStep1st;
+    // Calculate the elapsed time for the first instance
+    long secondInMillisStep1st = 1000;
+    long minuteInMillisStep1st = secondInMillisStep1st * 60;
+    long hourInMillisStep1st = minuteInMillisStep1st * 60;
+    long dayInMillisStep1st = hourInMillisStep1st * 24;
+    long elapsedDaysStep1st = temporaryPerfElapsedTimeStep1st / dayInMillisStep1st;
+    temporaryPerfElapsedTimeStep1st = temporaryPerfElapsedTimeStep1st % dayInMillisStep1st;
+    long elapsedHoursStep1st = temporaryPerfElapsedTimeStep1st / hourInMillisStep1st;
+    temporaryPerfElapsedTimeStep1st = temporaryPerfElapsedTimeStep1st % hourInMillisStep1st;
+    long elapsedMinutesStep1st = temporaryPerfElapsedTimeStep1st / minuteInMillisStep1st;
+    temporaryPerfElapsedTimeStep1st = temporaryPerfElapsedTimeStep1st % minuteInMillisStep1st;
+    long elapsedSecondsStep1st = temporaryPerfElapsedTimeStep1st / secondInMillisStep1st;
+    temporaryPerfElapsedTimeStep1st = temporaryPerfElapsedTimeStep1st % secondInMillisStep1st;
+    long elapsedMilliSecondsStep1st = temporaryPerfElapsedTimeStep1st % secondInMillisStep1st;
 
-		String perfElapsedTimeStep1st = elapsedDaysStep1st + "d " + elapsedHoursStep1st + "h " + elapsedMinutesStep1st + "m " + elapsedSecondsStep1st + "s+" + elapsedMilliSecondsStep1st + "ms"
+    String perfElapsedTimeStep1st = elapsedDaysStep1st + "d " + elapsedHoursStep1st + "h " + elapsedMinutesStep1st + "m " + elapsedSecondsStep1st + "s+" + elapsedMilliSecondsStep1st + "ms"
 
     List temporaryList = mapResult.get("$testStepName")
     long temporaryLong1st = temporaryList.get(4) + diffPerfElapsedTimeStep1st
@@ -662,22 +667,22 @@ while(indexRunner < wsdlTestSteps.size())
         error = testStep.getAssertionAt(count).getErrors();
         if (error != null)
         {
-	            validResponse = false;
-	            strAssertionError = strAssertionError + error
-	            strAssertionErrorToReport = "The first instance request's assertions FAILED by the following error(s) \"" +  strAssertionError + "\""
-	        	  log.warn (" ${text*9} " + strAssertionErrorToReport)
+              validResponse = false;
+              strAssertionError = strAssertionError + error
+              strAssertionErrorToReport = "The first instance request's assertions FAILED by the following error(s) \"" +  strAssertionError + "\""
+              log.warn (" ${text*9} " + strAssertionErrorToReport)
         }
     }
     def tempXmlResponse = null;
     try
     {
-	   tempXmlResponse = groovyUtils.getXmlHolder("$testStepName#Response");
+     tempXmlResponse = groovyUtils.getXmlHolder("$testStepName#Response");
     }
     catch(Exception xex)
     {
-	   validResponse = false;
-	   strException = xex.toString()
-	   log.error (" ${text*9} XML Exception happens at the first instance " + xex.toString())
+     validResponse = false;
+     strException = xex.toString()
+     log.error (" ${text*9} XML Exception happens at the first instance " + xex.toString())
     }
     if(!validResponse)
     {
@@ -685,21 +690,22 @@ while(indexRunner < wsdlTestSteps.size())
         testResult = false;
         strFileCompareTestResult = "BLOCKED"
 
-	   if(strException != null)
-	   {
-	   		err1 = strException
-	   }
-	   else
-	   {
-	   		err1 = strAssertionErrorToReport;
-	   }
+     if(strException != null)
+     {
+        err1 = strException
+     }
+     else
+     {
+        err1 = strAssertionErrorToReport;
+     }
 
-	   err = err1;
+     err = err1;
 
-	   temporaryList = mapResult.get("$testStepName")
+     temporaryList = mapResult.get("$testStepName")
         temporaryNoteFirstInstance = "Blocked at company \"$companyName\", line number $indexExcel, reason: \"$err1 get from the first instance \"$strFirstInstance\""
-
-	   int temporaryInt = temporaryList.get(2) + 1
+        log.info("temporaryList in if(!validResponse) = " +  temporaryList.get(2) + 1 )
+     int temporaryInt = temporaryList.get(2) + 1
+     log.info("temporaryList in if(!validResponse) = " + temporaryList.set(2, temporaryInt))
         temporaryList.set(2, temporaryInt);
 
         mapResult.put("$testStepName", temporaryList)
@@ -707,9 +713,9 @@ while(indexRunner < wsdlTestSteps.size())
     else
     {
             // Write XML from response of the first instance to local
-       	  def xmlParser = new XmlParser()
-        	  responseXmlHolder = groovyUtils.getXmlHolder("$testStepName#Response");
-        	  def xmlNodeResponse = responseXmlHolder.getXml()
+          def xmlParser = new XmlParser()
+            responseXmlHolder = groovyUtils.getXmlHolder("$testStepName#Response");
+            def xmlNodeResponse = responseXmlHolder.getXml()
             try
             {
                 fileResponse = new File(temporaryXmlFile);
@@ -727,52 +733,52 @@ while(indexRunner < wsdlTestSteps.size())
             testRunner.testCase.getTestStepByName("$testStepName").getHttpRequest().setEndpoint(strSecondInstance)
            //-----Set Username/Password for instance 2--------
 
-    			testRunner.testCase.getTestStepByName("$testStepName").httpRequest.setUsername(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.auth." + "$testStepName" + ".inst2.username"))
-    			testRunner.testCase.getTestStepByName("$testStepName").httpRequest.setPassword(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.auth." + "$testStepName" + ".inst2.password"))
+          testRunner.testCase.getTestStepByName("$testStepName").httpRequest.setUsername(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.auth." + "$testStepName" + ".inst2.username"))
+          testRunner.testCase.getTestStepByName("$testStepName").httpRequest.setPassword(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.auth." + "$testStepName" + ".inst2.password"))
 
             // Trace the start time
-		    Date startStep2nd = new Date()
-		    long lStartStep2nd = startStep2nd.getTime();
+        Date startStep2nd = new Date()
+        long lStartStep2nd = startStep2nd.getTime();
 
-		if (strInstance2ArticleRequestID == "TD_KEY")
-		{
-			com.eviware.soapui.SoapUI.globalProperties.setPropertyValue("companyNoID", companyTDKey);
-		}
-		else if (strInstance2ArticleRequestID == "OFWI_ID")
-		{
-			com.eviware.soapui.SoapUI.globalProperties.setPropertyValue("companyNoID", companyOFWIID);
-		}
-		else if (strInstance2ArticleRequestID == "CRIFID_COREDB")
-		{
-			com.eviware.soapui.SoapUI.globalProperties.setPropertyValue("companyNoID", companyCRIFIDCoreDB);
-		}
+    if (strInstance2ArticleRequestID == "TD_KEY")
+    {
+      com.eviware.soapui.SoapUI.globalProperties.setPropertyValue("companyNoID", companyTDKey);
+    }
+    else if (strInstance2ArticleRequestID == "OFWI_ID")
+    {
+      com.eviware.soapui.SoapUI.globalProperties.setPropertyValue("companyNoID", companyOFWIID);
+    }
+    else if (strInstance2ArticleRequestID == "CRIFID_COREDB")
+    {
+      com.eviware.soapui.SoapUI.globalProperties.setPropertyValue("companyNoID", companyCRIFIDCoreDB);
+    }
 
-			// Run the test request for the second instance
+      // Run the test request for the second instance
             log.info " ${text*9} Running request to the second instance URL " + strSecondInstance +" with company number ID: " + com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("companyNoID");
             testRunner.runTestStepByName("$testStepName");
 
-		// Trace the end time
-	    Date endStep2nd = new Date()
-	    long lEndStep2nd = endStep2nd.getTime();
+    // Trace the end time
+      Date endStep2nd = new Date()
+      long lEndStep2nd = endStep2nd.getTime();
 
-	    long diffPerfElapsedTimeStep2nd = lEndStep2nd - lStartStep2nd;
-	    long temporaryPerfElapsedTimeStep2nd = diffPerfElapsedTimeStep2nd;
+      long diffPerfElapsedTimeStep2nd = lEndStep2nd - lStartStep2nd;
+      long temporaryPerfElapsedTimeStep2nd = diffPerfElapsedTimeStep2nd;
 
-		// Calculate the elapsed time for the second instance
-		long secondInMillisStep2nd = 1000;
-		long minuteInMillisStep2nd = secondInMillisStep2nd * 60;
-		long hourInMillisStep2nd = minuteInMillisStep2nd * 60;
-		long dayInMillisStep2nd = hourInMillisStep2nd * 24;
-		long elapsedDaysStep2nd = temporaryPerfElapsedTimeStep2nd / dayInMillisStep2nd;
-		temporaryPerfElapsedTimeStep2nd = temporaryPerfElapsedTimeStep2nd % dayInMillisStep2nd;
-		long elapsedHoursStep2nd = temporaryPerfElapsedTimeStep2nd / hourInMillisStep2nd;
-		temporaryPerfElapsedTimeStep2nd = temporaryPerfElapsedTimeStep2nd % hourInMillisStep2nd;
-		long elapsedMinutesStep2nd = temporaryPerfElapsedTimeStep2nd / minuteInMillisStep2nd;
-		temporaryPerfElapsedTimeStep2nd = temporaryPerfElapsedTimeStep2nd % minuteInMillisStep2nd;
-		long elapsedSecondsStep2nd = temporaryPerfElapsedTimeStep2nd / secondInMillisStep2nd;
-		temporaryPerfElapsedTimeStep2nd = temporaryPerfElapsedTimeStep2nd % secondInMillisStep2nd;
-		long elapsedMilliSecondsStep2nd = temporaryPerfElapsedTimeStep2nd % secondInMillisStep2nd;
-		String perfElapsedTimeStep2nd = elapsedDaysStep2nd + "d " + elapsedHoursStep2nd + "h " + elapsedMinutesStep2nd + "m " + elapsedSecondsStep2nd + "s+" + elapsedMilliSecondsStep2nd + "ms"
+    // Calculate the elapsed time for the second instance
+    long secondInMillisStep2nd = 1000;
+    long minuteInMillisStep2nd = secondInMillisStep2nd * 60;
+    long hourInMillisStep2nd = minuteInMillisStep2nd * 60;
+    long dayInMillisStep2nd = hourInMillisStep2nd * 24;
+    long elapsedDaysStep2nd = temporaryPerfElapsedTimeStep2nd / dayInMillisStep2nd;
+    temporaryPerfElapsedTimeStep2nd = temporaryPerfElapsedTimeStep2nd % dayInMillisStep2nd;
+    long elapsedHoursStep2nd = temporaryPerfElapsedTimeStep2nd / hourInMillisStep2nd;
+    temporaryPerfElapsedTimeStep2nd = temporaryPerfElapsedTimeStep2nd % hourInMillisStep2nd;
+    long elapsedMinutesStep2nd = temporaryPerfElapsedTimeStep2nd / minuteInMillisStep2nd;
+    temporaryPerfElapsedTimeStep2nd = temporaryPerfElapsedTimeStep2nd % minuteInMillisStep2nd;
+    long elapsedSecondsStep2nd = temporaryPerfElapsedTimeStep2nd / secondInMillisStep2nd;
+    temporaryPerfElapsedTimeStep2nd = temporaryPerfElapsedTimeStep2nd % secondInMillisStep2nd;
+    long elapsedMilliSecondsStep2nd = temporaryPerfElapsedTimeStep2nd % secondInMillisStep2nd;
+    String perfElapsedTimeStep2nd = elapsedDaysStep2nd + "d " + elapsedHoursStep2nd + "h " + elapsedMinutesStep2nd + "m " + elapsedSecondsStep2nd + "s+" + elapsedMilliSecondsStep2nd + "ms"
 
     String temporaryStrPerfElapsedTimeStep = perfElapsedTimeStep1st + "\n-------------------------\n" + perfElapsedTimeStep2nd
 
@@ -781,108 +787,111 @@ while(indexRunner < wsdlTestSteps.size())
     temporaryList.set(5, temporaryLong2nd);
     mapResult.put("$testStepName", temporaryList)
 
-		  validResponse = true;
+      validResponse = true;
 
-		  strAssertionError = ""
+      strAssertionError = ""
             counter = testStep.getAssertionList().size();
             for (count in 0..<counter)
             {
                 error = testStep.getAssertionAt(count).getErrors();
                 if (error != null)
                 {
-	            validResponse = false;
-	            strAssertionError = strAssertionError + error
-	            strAssertionErrorToReport = "The second instance request's assertions FAILED by the following error(s) \"" +  strAssertionError + "\""
-	        	  log.warn (" ${text*9} " + strAssertionErrorToReport)
+              validResponse = false;
+              strAssertionError = strAssertionError + error
+              strAssertionErrorToReport = "The second instance request's assertions FAILED by the following error(s) \"" +  strAssertionError + "\""
+              log.warn (" ${text*9} " + strAssertionErrorToReport)
                 }
             }
               tempXmlResponse = null;
-		    xex2 = null
-		    strException = null
-		    try
-		    {
-			   tempXmlResponse = groovyUtils.getXmlHolder("$testStepName#Response");
-		    }
-		    catch(Exception xex2)
-		    {
-		    	   strException = xex2.toString()
-			   validResponse = false;
-			   log.error (" ${text*9} XML Exception happens at the second instance " + xex2.toString())
-		    }
+        xex2 = null
+        strException = null
+        try
+        {
+         tempXmlResponse = groovyUtils.getXmlHolder("$testStepName#Response");
+        }
+        catch(Exception xex2)
+        {
+             strException = xex2.toString()
+         validResponse = false;
+         log.error (" ${text*9} XML Exception happens at the second instance " + xex2.toString())
+        }
             if(!validResponse)
             {
-			   log.error(" ${text*9} The $testStepName step is failed by the assertions check - STOP the test for this company " + companyName);
-		        testResult = false;
-		        strFileCompareTestResult = "BLOCKED"
-		        if(strException != null)
-			   {
-			   		err2 = strException
-			   }
-			   else
-			   {
-			   		err2 = strAssertionErrorToReport;
-			   }
-			   String temporaryNoteNew;
-			   String temporaryNoteSecondInstance = "Blocked at company \"$companyName\", line number $indexExcel, reason: \"$err2\" get from the second instance \"$strSecondInstance\" \n" + "\n"
-		        if(err1 != null)
-		        {
-		        	  err = err1 + " and "+ err2
-		        	  temporaryNoteNew = temporaryNoteFirstInstance + " AND there also " + temporaryNoteSecondInstance
-		        }
-		        else
-		        {
-		        	  err = err2;
-		        	  temporaryNoteNew = temporaryNoteSecondInstance;
-		        }
+         log.error(" ${text*9} The $testStepName step is failed by the assertions check - STOP the test for this company " + companyName);
+            testResult = false;
+            strFileCompareTestResult = "BLOCKED"
+            if(strException != null)
+         {
+            err2 = strException
+         }
+         else
+         {
+            err2 = strAssertionErrorToReport;
+         }
+         String temporaryNoteNew;
+         String temporaryNoteSecondInstance = "Blocked at company \"$companyName\", line number $indexExcel, reason: \"$err2\" get from the second instance \"$strSecondInstance\" \n" + "\n"
+            if(err1 != null)
+            {
+                err = err1 + " and "+ err2
+                temporaryNoteNew = temporaryNoteFirstInstance + " AND there also " + temporaryNoteSecondInstance
+            }
+            else
+            {
+                err = err2;
+                temporaryNoteNew = temporaryNoteSecondInstance;
+            }
 
-		        temporaryList = mapResult.get("$testStepName")
-			   int temporaryInt;
-			   if(temporaryNoteFirstInstance == "")
-			   {
-			       temporaryInt = temporaryList.get(2) + 1
-			   }
-		        else
-		        {
-		        	  temporaryInt = temporaryList.get(2) + 0
-		        }
-		        temporaryList.set(2, temporaryInt);
-		        String temporaryNoteOld = temporaryList.get(3).toString()
-		        temporaryNoteReport = temporaryNoteOld + temporaryNoteNew
-		        temporaryList.set(3, temporaryNoteReport);
-		        mapResult.put("$testStepName", temporaryList)
-		        errCompare = temporaryNoteReport
+            temporaryList = mapResult.get("$testStepName")
+         int temporaryInt;
+         if(temporaryNoteFirstInstance == "")
+         {
+              log.info("++++Increase Fail count due to temporaryList.get(2) + 1  in temporaryNoteFirstInstance+++++")
+             temporaryInt = temporaryList.get(2) + 1
+             log.info("temporaryList at if(temporaryNoteFirstInstance) " + temporaryList.get(2) )
+         }
+            else
+            {
+                log.info("Not Increase Fail count due to temporaryList.get(2) + 0  in temporaryNoteFirstInstance")
+                temporaryInt = temporaryList.get(2) + 0
+            }
+            temporaryList.set(2, temporaryInt);
+            String temporaryNoteOld = temporaryList.get(3).toString()
+            temporaryNoteReport = temporaryNoteOld + temporaryNoteNew
+            temporaryList.set(3, temporaryNoteReport);
+            mapResult.put("$testStepName", temporaryList)
+            errCompare = temporaryNoteReport
 
-		        temporaryNoteReport = ""
-		        temporaryNoteNew = ""
-		        temporaryNoteSecondInstance = ""
-		        temporaryNoteFirstInstance = ""
+            temporaryNoteReport = ""
+            temporaryNoteNew = ""
+            temporaryNoteSecondInstance = ""
+            temporaryNoteFirstInstance = ""
             }
 
             else
             {
-            	  // Write XML from response of the second instance to local
-	       	  def xmlParser = new XmlParser()
-	        	  responseXmlHolder = groovyUtils.getXmlHolder("$testStepName#Response");
-	        	  def xmlNodeResponse = responseXmlHolder.getXml()
-	            try
-	            {
-	                fileResponse = new File(temporaryXmlFile2);
-	                fileResponse.delete();
-	                fileResponse.write(responseXmlHolder.xml, "UTF-8");
-	            }
-	            catch (Exception ex)
-	            {
-	                log.error(" ${text*9} ${ex.message}");
-	                testResult = false;
-	            }
+                // Write XML from response of the second instance to local
+            def xmlParser = new XmlParser()
+              responseXmlHolder = groovyUtils.getXmlHolder("$testStepName#Response");
+              def xmlNodeResponse = responseXmlHolder.getXml()
+              try
+              {
+                  fileResponse = new File(temporaryXmlFile2);
+                  fileResponse.delete();
+                  fileResponse.write(responseXmlHolder.xml, "UTF-8");
+              }
+              catch (Exception ex)
+              {
+                  log.error(" ${text*9} ${ex.message}");
+                  testResult = false;
+              }
 
-            	if(err1 == null)
-            	{
-            		xmlParser = new XmlParser()
-        			responseXmlHolder = groovyUtils.getXmlHolder("$testStepName#Response");
-       			xmlNodeResponse = responseXmlHolder.getXml()
-        			xmlFileResponse = xmlParser.parseText(xmlNodeResponse)
-        			nodeXmlResponse = xmlFileResponse.'**'.find{ node-> node.name() == "message"}
+              if(err1 == null)
+              {
+                xmlParser = new XmlParser()
+              responseXmlHolder = groovyUtils.getXmlHolder("$testStepName#Response");
+            xmlNodeResponse = responseXmlHolder.getXml()
+              xmlFileResponse = xmlParser.parseText(xmlNodeResponse)
+              nodeXmlResponse = xmlFileResponse.'**'.find{ node-> node.name() == "message"}
                     // Compare XML files
                     // Get contents of the first response from XML file in local
                     log.info " ${text*9} Comparing XML contents between the instance1 and instance 2 response";
@@ -897,160 +906,160 @@ while(indexRunner < wsdlTestSteps.size())
                     secondResponse = holder.getXml()
                     xmlSecondResponse = xmlParser.parseText(secondResponse)
 
-				// Define the ignored attributes - Please enter both node-attribute
-			        String strIgnoreAttributesWithNode = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("listIgnoreAttribute")
-			        if(strIgnoreAttributesWithNode)
-			        {
-			        def lstIgnoreAttributesCouple = strIgnoreAttributesWithNode.split(',')
+        // Define the ignored attributes - Please enter both node-attribute
+              String strIgnoreAttributesWithNode = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("listIgnoreAttribute")
+              if(strIgnoreAttributesWithNode)
+              {
+              def lstIgnoreAttributesCouple = strIgnoreAttributesWithNode.split(',')
 
-					for (j in 0..(lstIgnoreAttributesCouple.size())-1)
-					{
-						varCouple = lstIgnoreAttributesCouple[j].toString()
-						def lstNodeAndAttribute = varCouple.split('-')
+          for (j in 0..(lstIgnoreAttributesCouple.size())-1)
+          {
+            varCouple = lstIgnoreAttributesCouple[j].toString()
+            def lstNodeAndAttribute = varCouple.split('-')
 
-			        	  varNode = lstNodeAndAttribute[0].toString().trim()
-			        	  varAttribute = lstNodeAndAttribute[1].toString().trim()
+                  varNode = lstNodeAndAttribute[0].toString().trim()
+                  varAttribute = lstNodeAndAttribute[1].toString().trim()
 
-			            log.info " ${text*15} The ignored attribute is " + varAttribute + " of node " + varNode
-				 		def nodeArtikelList1 = xmlFirstResponse.'**'.findAll{ node-> node.name() == "$varNode"};
-				 		def nodeArtikelList2 = xmlSecondResponse.'**'.findAll{ node-> node.name() == "$varNode"};
+                  log.info " ${text*15} The ignored attribute is " + varAttribute + " of node " + varNode
+            def nodeArtikelList1 = xmlFirstResponse.'**'.findAll{ node-> node.name() == "$varNode"};
+            def nodeArtikelList2 = xmlSecondResponse.'**'.findAll{ node-> node.name() == "$varNode"};
 
-			            if( nodeArtikelList1.size() != 0)
-			            {
-			            	def lstattribute = xmlFirstResponse.'**'.findAll{ it.name() == "$varNode" }.findAll { it.@"$varAttribute"}
-			            	if (lstattribute.size() !=0)
-			            	{
-			            	lstattribute.each{ it.@"$varAttribute" = "This element is intentionally ignored for xml comparison"}
-			            		}
-			            		else
-			            		{
-			            			log.warn " ${text*18} The ignored Attribute $varAttribute was not found from the first response"
-			            			}
-			            }
-			            else
-			            {
-			            	 log.warn " ${text*18} The Node $varNode was not found from the first response"
-			            }
-			            if( nodeArtikelList2.size() != 0)
-			            {
-			            	def lstattribute = xmlSecondResponse.'**'.findAll{ it.name() == "$varNode" }.findAll { it.@"$varAttribute"}
-			            	if (lstattribute.size() !=0)
-			            	{
-			            	lstattribute.each{ it.@"$varAttribute" = "This element is intentionally ignored for xml comparison"}
-			            		}
-			            		else
-			            		{
-			            			log.warn " ${text*18} The ignored Attribute $varAttribute was not found from the second response"
-			            			}
-			            }
-			            else
-			            {
-			            	 log.warn " ${text*18} The Node $varNode was not found from the second response"
-			            }
-			        }
-			        }
+                  if( nodeArtikelList1.size() != 0)
+                  {
+                    def lstattribute = xmlFirstResponse.'**'.findAll{ it.name() == "$varNode" }.findAll { it.@"$varAttribute"}
+                    if (lstattribute.size() !=0)
+                    {
+                    lstattribute.each{ it.@"$varAttribute" = "This element is intentionally ignored for xml comparison"}
+                      }
+                      else
+                      {
+                        log.warn " ${text*18} The ignored Attribute $varAttribute was not found from the first response"
+                        }
+                  }
+                  else
+                  {
+                     log.warn " ${text*18} The Node $varNode was not found from the first response"
+                  }
+                  if( nodeArtikelList2.size() != 0)
+                  {
+                    def lstattribute = xmlSecondResponse.'**'.findAll{ it.name() == "$varNode" }.findAll { it.@"$varAttribute"}
+                    if (lstattribute.size() !=0)
+                    {
+                    lstattribute.each{ it.@"$varAttribute" = "This element is intentionally ignored for xml comparison"}
+                      }
+                      else
+                      {
+                        log.warn " ${text*18} The ignored Attribute $varAttribute was not found from the second response"
+                        }
+                  }
+                  else
+                  {
+                     log.warn " ${text*18} The Node $varNode was not found from the second response"
+                  }
+              }
+              }
 
-			        // Define the ignored specific node - Please enter the node name in Property file
-			        strIgnoreNode = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("listIgnoreSpecificNode")
-			        if(strIgnoreNode)
-					{
-				        lstIgnoreNode = strIgnoreNode.split(',')
+              // Define the ignored specific node - Please enter the node name in Property file
+              strIgnoreNode = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("listIgnoreSpecificNode")
+              if(strIgnoreNode)
+          {
+                lstIgnoreNode = strIgnoreNode.split(',')
 
-				        // Edit the ignored nodes in xml response
-				        for (i in 0..(lstIgnoreNode.size())-1)
-				        {
-				            varNode = lstIgnoreNode[i].toString().trim()
-				            log.info " ${text*15} The ignore specific node is " + varNode
+                // Edit the ignored nodes in xml response
+                for (i in 0..(lstIgnoreNode.size())-1)
+                {
+                    varNode = lstIgnoreNode[i].toString().trim()
+                    log.info " ${text*15} The ignore specific node is " + varNode
 
-				            lstNode = xmlFirstResponse.'**'."$varNode"
-				            lstNode1 = xmlSecondResponse.'**'."$varNode"
-				            if (lstNode.size() != 0)
-				            {
-				                     lstNode.each
-				                     {
-				            			it.value = "This element is intentionally ignored for xml comparison";
-				                     }
-				            }
-				            else
-				              {
-				                  log.warn " ${text*18} The ignored specific node $varNode was not found from the first response"
-				              }
-				              if (lstNode1.size() != 0)
-				            {
-				                     lstNode1.each
-				                     {
-				            			it.value = "This element is intentionally ignored for xml comparison";
-				                     }
-				            }
-				            else
-				              {
-				                  log.warn " ${text*18} The ignored specific node $varNode was not found from the second response"
-				              }
-				        }
-					}
+                    lstNode = xmlFirstResponse.'**'."$varNode"
+                    lstNode1 = xmlSecondResponse.'**'."$varNode"
+                    if (lstNode.size() != 0)
+                    {
+                             lstNode.each
+                             {
+                          it.value = "This element is intentionally ignored for xml comparison";
+                             }
+                    }
+                    else
+                      {
+                          log.warn " ${text*18} The ignored specific node $varNode was not found from the first response"
+                      }
+                      if (lstNode1.size() != 0)
+                    {
+                             lstNode1.each
+                             {
+                          it.value = "This element is intentionally ignored for xml comparison";
+                             }
+                    }
+                    else
+                      {
+                          log.warn " ${text*18} The ignored specific node $varNode was not found from the second response"
+                      }
+                }
+          }
 
-					// Define ignored node and sub node - Please enter the node name in Property file
-					String strIgnoreNodeAndSubNode = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("listIgnoreNodeAndSubNodeValue")
-			        if(strIgnoreNodeAndSubNode)
-					{
-				        def lstIgnoreNodeAndSubNode = strIgnoreNodeAndSubNode.split(',')
+          // Define ignored node and sub node - Please enter the node name in Property file
+          String strIgnoreNodeAndSubNode = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("listIgnoreNodeAndSubNodeValue")
+              if(strIgnoreNodeAndSubNode)
+          {
+                def lstIgnoreNodeAndSubNode = strIgnoreNodeAndSubNode.split(',')
 
-				        // Edit the ignored nodes in xml response
-				        for (i in 0..(lstIgnoreNodeAndSubNode.size())-1)
-				        {
-				            varNode = lstIgnoreNodeAndSubNode[i].toString().trim()
-				            log.info " ${text*15} The ignore parent node is " + varNode
+                // Edit the ignored nodes in xml response
+                for (i in 0..(lstIgnoreNodeAndSubNode.size())-1)
+                {
+                    varNode = lstIgnoreNodeAndSubNode[i].toString().trim()
+                    log.info " ${text*15} The ignore parent node is " + varNode
 
-				            p = xmlFirstResponse.'**'."$varNode"
-				            p1 = xmlSecondResponse.'**'."$varNode"
-				            if (p.size() != 0)
-				            {
-				                     p.each
-				                     {
-				                     	def childrenNodes = it.children();
-				                             if(childrenNodes.size() > 1)
-				                             {
-				                                 for(childIndex in 0 ..(childrenNodes.size()-1))
-				                                 {
-				                                     childNode = childrenNodes[childIndex];
-				                                     childNode.value = "This element is intentionally ignored for xml comparison";
-				                                 }
-				                              }
-				                          else
-				                          {
-				                               it.value = "This element is intentionally ignored for xml comparison";
-				                          }
-				              }
-				            }
-				              else
-				              {
-				                  log.warn " ${text*18} The ignored parent node $varNode was not found from the first response"
-				              }
-				              if (p1.size() != 0)
-				              {
-				                      p1.each
-				                      {
-				                         	def childrenNodes = it.children();
-				                         	if(childrenNodes.size() > 1)
-				                              {
-				                                  for(childIndex in 0 ..(childrenNodes.size()-1))
-				                                  {
-				                                       childNode = childrenNodes[childIndex];
-				                                  	    childNode.value = "This element is intentionally ignored for xml comparison";
-				                                  }
-				                         	}
-				                      	 else
-				                      	 {
-				                         	it.value = "This element is intentionally ignored for xml comparison";
-				                      	 }
-				                 	  }
-				              }
-				              else
-				              {
-				                  	   log.warn " ${text*18} The ignored parent node $varNode was not found from the second response"
-				              }
-				          }
-					}
+                    p = xmlFirstResponse.'**'."$varNode"
+                    p1 = xmlSecondResponse.'**'."$varNode"
+                    if (p.size() != 0)
+                    {
+                             p.each
+                             {
+                              def childrenNodes = it.children();
+                                     if(childrenNodes.size() > 1)
+                                     {
+                                         for(childIndex in 0 ..(childrenNodes.size()-1))
+                                         {
+                                             childNode = childrenNodes[childIndex];
+                                             childNode.value = "This element is intentionally ignored for xml comparison";
+                                         }
+                                      }
+                                  else
+                                  {
+                                       it.value = "This element is intentionally ignored for xml comparison";
+                                  }
+                      }
+                    }
+                      else
+                      {
+                          log.warn " ${text*18} The ignored parent node $varNode was not found from the first response"
+                      }
+                      if (p1.size() != 0)
+                      {
+                              p1.each
+                              {
+                                  def childrenNodes = it.children();
+                                  if(childrenNodes.size() > 1)
+                                      {
+                                          for(childIndex in 0 ..(childrenNodes.size()-1))
+                                          {
+                                               childNode = childrenNodes[childIndex];
+                                                childNode.value = "This element is intentionally ignored for xml comparison";
+                                          }
+                                  }
+                                 else
+                                 {
+                                  it.value = "This element is intentionally ignored for xml comparison";
+                                 }
+                            }
+                      }
+                      else
+                      {
+                               log.warn " ${text*18} The ignored parent node $varNode was not found from the second response"
+                      }
+                  }
+          }
 
                     // Set contents of first response to compare
                     new XmlNodePrinter(new PrintWriter(writerFirstReponse)).print(xmlFirstResponse)
@@ -1074,11 +1083,11 @@ while(indexRunner < wsdlTestSteps.size())
                     XMLUnit.setIgnoreAttributeOrder(true)
 
                     // Compare the XMLcontens - Report if there is any inconsistency
-				xmlDiff = new Diff(strFirstResponse, strSecondResponse)
-			     def detailedDiff = new DetailedDiff(xmlDiff)
-				List differences = detailedDiff.getAllDifferences()
+        xmlDiff = new Diff(strFirstResponse, strSecondResponse)
+           def detailedDiff = new DetailedDiff(xmlDiff)
+        List differences = detailedDiff.getAllDifferences()
 
-			     testResult = xmlDiff.identical()
+           testResult = xmlDiff.identical()
                     /*
                     * Log test result status
                     */
@@ -1094,250 +1103,242 @@ while(indexRunner < wsdlTestSteps.size())
                      }
                      else
                      {
-//                     	errCompare = getErrorMessageCompare(differences);
-//	                   log.error " ${text*9} Compare XML files - Result testing for testStep $testStepName : ------>>>>>> FAILED due to the missmatch error " + errCompare;
-//	                   temporaryList = mapResult.get("$testStepName")
-//	                   int temporaryInt = temporaryList.get(1) + 1
-//	                   temporaryList.set(1, temporaryInt);
-//	                   String temporaryNoteOld = temporaryList.get(3).toString()
-//	                   String temporaryNoteNew = "*** Failed at company \"$companyName\", line number $indexExcel, reason: " + errCompare.toString() + "\n" + "\n"
-//	                   temporaryNoteReport = temporaryNoteOld + temporaryNoteNew
-//	                   temporaryList.set(3, temporaryNoteReport);
-//	                   mapResult.put("$testStepName", temporaryList)
-//	                   temporaryNoteReport = ""
-//	                   temporaryNoteNew = ""
-//	                   String testStepNoteFile = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "SPC_testResults" + "//" + "$testStepName" + "_Result_articleRequest_Details_Notes.txt"
-//				    errCompare = "Please refer to the TXT note file " + testStepNoteFile.replace("//", "/")
+          errCompare = getErrorMessageCompare(differences);
+                     log.error " ${text*9} Compare XML files - Result testing for testStep $testStepName : ------>>>>>> FAILED due to the missmatch error " + errCompare;
+                     temporaryList = mapResult.get("$testStepName")
+                     int temporaryInt = temporaryList.get(1) + 1
+                     temporaryList.set(1, temporaryInt);
+//                     String temporaryNoteOld = temporaryList.get(3).toString()
+//                     String temporaryNoteNew = "*** Failed at company \"$companyName\", line number $indexExcel, reason: " + errCompare.toString() + "\n" + "\n"
+//                     temporaryNoteReport = temporaryNoteOld + temporaryNoteNew
+//                     temporaryList.set(3, temporaryNoteReport);
+//                     mapResult.put("$testStepName", temporaryList)
+//                     temporaryNoteReport = ""
+//                     temporaryNoteNew = ""
+//                     String testStepNoteFile = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "SPC_testResults" + "//" + "$testStepName" + "_Result_articleRequest_Details_Notes.txt"
+//            errCompare = "Please refer to the TXT note file " + testStepNoteFile.replace("//", "/")
 
-				    // --------------------------NEW--------------------------
-				    List nodeInExcel = [];
-				    Label cellResultsubject = null
-            List listIssue = [];
-				    Label cellResultis1 = null
-            List listXpathInstance = new ArrayList<String>();
-            List locationXMLFileOf2Instance = [];
-				    Label cellResultis2 = null
-            Label cellIdResult = null
-            Label cellXpathNull = null
-//            int indexExcelSheetIssue = 1
-//            log.info("Start to collect ListIssue in SheetIssue Excel")
-//            while (!sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString().equals(""))
-//               {
-//                 if (sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString().equals(""))
-//                 {
-//                   break;
-//                 }
-//                 listIssue.add[sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString()]
-//               }
-        log.inf("STAR DEBUGGING =================> ")
-  			int indexExcelSheetIssue = 1
-            int u = 0;
-            log.info("++++Start to collect ListIssue in SheetIssue Excel++++")
-            // at every row, check if they have data, then add to listIssue
-            while (!sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString().equals(""))
-               {
-                 log.info("Check row " + indexExcelSheetIssue + "isRowEmpty status boolean is " + isRowEmpty)
-                 listIssue.add(sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString())
-              //   log.info("at row " + indexExcelSheetIssue + "listIssue is added " + listIssue.get[u])
-                 indexExcelSheetIssue++
-                 u++
-               }
-            log.info("++++List issue size is +++++" + listIssue.size())
-				    for(int j = 0; j <= differences.size()-1; j++)
-				    {
-            String issue = differences.get(j);
-						log.info("issuee-----------------" + issue);
-						String subject = issue.substring(0, issue.indexOf('at '));
-						log.info("subject--------" + subject)
-						String xpathInstance1
-						String xpathInstance2
-						String tempxpathInstance1 = issue.substring(issue.indexOf(' at'), issue.indexOf("to", issue.indexOf('at')));
-						String tempxpathInstance2 = issue.substring(issue.lastIndexOf('at ')).substring("]".indexOf("]"));
-						if (tempxpathInstance1.contains('null'))
-						{
-							 xpathInstance1 = "null";
-						}
-						else
-						{
-							 xpathInstance1 = tempxpathInstance1.substring(tempxpathInstance1.indexOf("/artikelList[1]")).substring("]".indexOf("]"));
-						}
 
-						log.info("instance1 ===========" + xpathInstance1);
-						if (tempxpathInstance2.contains("null"))
-						{
-							 xpathInstance2 = "null";
-						}
-						else
-						{
-							 xpathInstance2 = tempxpathInstance2.substring(tempxpathInstance2.lastIndexOf("/artikelList[1]")).substring("]".indexOf("]"));
-						}
-						log.info("instance2 ===========" + xpathInstance2);
-            // add instance 1 xpath and instance 2 xpath to listXpath
-            if (listXpathInstance.size() > 0)
+            // -=========NEW=========Release 1045 SPC - Refactor the SPC reporting==============
+            Label cellResultsubject = null
+            int indexIssueExistedInListIssue = 0;
+            boolean isIssueExistedInListIssue = false
+                    List listIssue = [];
+            Label cellResultis1 = null
+            Label cellResultis2 = null
+                Label cellIdResult = null
+                Label cellXpathNull = null
+                log.info("STAR DEBUGGING =================> ")
+                lstIdResult =[]
+                log.info("listIDResult  at start " + lstIdResult.toString())
+            int indexExcelSheetIssue = 2
+                int u = 0;
+                log.info("++++Start to collect ListIssue in SheetIssue Excel++++")
+                // At every row, check if they have data, then add to listIssue
+                while (!sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString().equals(""))
+                   {
+                     listIssue.add(sheetIssues.getCell(1,indexExcelSheetIssue).getContents().toString())
+                     indexExcelSheetIssue++
+                     u++
+                   }
+                log.info("++++List issue size is +++++" + listIssue.size())
+                // ==============REFACTOR GET SUBJECT/XPATH1/XPATH2===============
+            for(int j = 0; j <= differences.size()-1; j++)
             {
-              listXpathInstance.set(0,xpathInstance1)
-              listXpathInstance.set(1,xpathInstance2)
-            }
-            else
-            {
-              listXpathInstance.add(0,xpathInstance1)
-              listXpathInstance.add(1,xpathInstance2)
-            }
-						nodeInExcel.add(subject);
-            //Compare current subject, if already existed then throw it, if not add to listIssue
-            if(listIssue.size() == 0)
-            {
-              listIssue.add(subject);
-            }
-            else
-            {
-                log.info("============= Start check if subject already existed in listIssue ==========================")
-                boolean isIssueExistedInListIssue = true
-                  for (int n = 0; n < listIssue.size(); n++ )
-                  {
-                    log.info(" --------- Comparing between new issue " + subject + " with listIssue at index " + n + " " + listIssue.get(n))
-                    if (subject.equals(listIssue.get(n)))
-                    {
-                          isIssueExistedInListIssue = true
-                          log.info("..... this issue  " + subject + " already existed in listIssue at index " + n + ".......")
-                          log.info(".... Issue in listIssue at index " + n " is " + listIssue.get(n))
-                          break
-                    }
-                    isIssueExistedInListIssue = false
-                  }
-
-                      if(isIssueExistedInListIssue == false)
-                      {
-                        listIssue.add(subject)
-                        log.info("..... this issue  " + subject + " is added to the list ..........")
-                        if (locationXMLFileOf2Instance.size() > 0)
+              List listXpathInstance = [];
+              List locationXMLFileOf2Instance = [];
+              Difference difference;
+              difference = differences.get(j);
+              if (!difference.isRecoverable())
+              {
+                        if(!difference.getDescription().equalsIgnoreCase("number of child nodes") && !difference.getDescription().equalsIgnoreCase("sequence of child nodes"))
                         {
-                            locationXMLFileOf2Instance.set(0,temporaryXmlFile)
-                            locationXMLFileOf2Instance.set(1,temporaryXmlFile2)
-                        }
-                        else
+                            String issue = differences.get(j);
+                            String subject = issue.substring(0, issue.indexOf('at '));
+                            log.info("issuee-----------------" + issue);
+                            String xpathInstance1
+                            String xpathInstance2
+                            String tempxpathInstance1 = differences.get(j).getControlNodeDetail().getXpathLocation();
+                            String tempxpathInstance2 = differences.get(j).getTestNodeDetail().getXpathLocation();
+                            if (tempxpathInstance1 == null)
+                            {
+                               xpathInstance1 = "null";
+                            }
+                            else
+                            {
+                                if (tempxpathInstance1.contains("@"))
+                                {
+                                  xpathInstance1 = tempxpathInstance1.substring(tempxpathInstance1.indexOf("/artikelList[1]"), tempxpathInstance1.lastIndexOf("/@")).trim()
+                                }
+                                else
+                                {
+                                   xpathInstance1 = tempxpathInstance1.substring(tempxpathInstance1.indexOf("/artikelList[1]")).substring("]".indexOf("]")).trim();
+                                }
+                            }
+
+                            log.info("instance1 ===========" + xpathInstance1);
+                            if (tempxpathInstance2 == null)
+                            {
+                               xpathInstance2 = "null";
+                            }
+                            else
+                            {
+                              if (tempxpathInstance2.contains("@"))
+                              {
+                                xpathInstance2 = tempxpathInstance2.substring(tempxpathInstance2.lastIndexOf("/artikelList[1]"), tempxpathInstance2.lastIndexOf("/@")).trim()
+                              }
+                              else
+                              {
+                                 xpathInstance2 = tempxpathInstance2.substring(tempxpathInstance2.lastIndexOf("/artikelList[1]")).substring("]".indexOf("]")).trim();
+                              }
+                            }
+                            log.info("instance2 ===========" + xpathInstance2);
+
+                        // add instance 1 xpath and instance 2 xpath to listXpath
+                          listXpathInstance.add(0,xpathInstance1)
+                          listXpathInstance.add(1,xpathInstance2)
+                          locationXMLFileOf2Instance.add(0,temporaryXmlFile)
+                          locationXMLFileOf2Instance.add(1,temporaryXmlFile2)
+
+                    //Compare current subject, if already existed then throw it, if not add to listIssue
+                        if (listIssue.size() > 0)
                         {
-                            locationXMLFileOf2Instance.add(0,temporaryXmlFile)
-                            locationXMLFileOf2Instance.add(1,temporaryXmlFile2)
-                        }
-          				     // File inputFile1 = new File(temporaryXmlFile)
-          				     // File inputFile2 = new File(temporaryXmlFile2)
-      				          int collumnIndexToWriteIssue2Instance = 2
-                        log.info("=======Start finding Cell index which doesn't have data yet=======")
-                        int IndexIssueExcel = 2
-                        boolean isRowEmptyInSheetIssue = sheetIssues.getCell(0,IndexIssueExcel).getContents().toString().equals("")
-                        log.info("at row " + IndexIssueExcel + " isRowEmptyInSheetIssue status is " + isRowEmptyInSheetIssue)
-                        while (!sheetIssues.getCell(0,IndexIssueExcel).getContents().toString().equals(""))
-                          {
-                                 log.info("at row " + IndexIssueExcel  + " is " + sheetIssues.getCell(0,IndexIssueExcel).getContents().toString())
-                                 IndexIssueExcel = IndexIssueExcel + 1
+                            log.info("============= Start check if subject already existed in listIssue ==========================")
+                              for (int indexListIssue = 0; indexListIssue < listIssue.size(); indexListIssue++ )
+                              {
+                                log.info(" --------- Comparing between new issue " + subject + " with listIssue at index " + indexListIssue + " " + listIssue.get(indexListIssue))
+                                if (subject.equals(listIssue.get(indexListIssue)))
+                                  {
+                                        isIssueExistedInListIssue = true
+                                        indexIssueExistedInListIssue = indexListIssue
+                                        log.info("..... this issue  " + subject + " already existed in listIssue at index " + indexListIssue + ".......")
+                                        log.info(".... Issue in listIssue at index " + indexListIssue + " is " + listIssue.get(indexListIssue))
+                                        indexIssueExistedInListIssue = indexIssueExistedInListIssue + 1
+                                        // ======================Check duplicate Id in lstIdResult 09 August 2018==============
+                                        boolean isIdExistedInLstId = false
+                                        for(int indexId = 0; indexId < lstIdResult.size(); indexId++)
+                                        {
+                                            if(indexIssueExistedInListIssue == lstIdResult.get(indexId))
+                                              {
+                                                isIdExistedInLstId = true
+                                              }
+                                        }
+                                        if (isIdExistedInLstId == false)
+                                          {
+                                              lstIdResult.add(indexIssueExistedInListIssue)
+                                          }
+
+                                         break
+                                  }
+                                isIssueExistedInListIssue = false
+                                log.info("..... this issue  " + subject + " is added to the list ..........")
+                              }
                           }
-                        String idResult = "" + IndexIssueExcel -2
-                        log.info("Index Excel which doesn't have data is " + IndexIssueExcel)
-                        for (int w = 0; w < locationXMLFileOf2Instance.size(); w++)
-                        {
 
-                                    cellIdResult = new Label(0, IndexIssueExcel, idResult);
-                                    cellResultsubject = new Label(1, IndexIssueExcel,subject);
-                                    //cellResultis1 = new Label(2, IndexIssueExcel,xpathInstance1);
-                                    //cellResultis2 = new Label(3, IndexIssueExcel,xpathInstance2);
-                                    sheetIssues.addCell(cellResultsubject)
-                                                        //sheetIssues.addCell(cellResultis1)
-                                                        //sheetIssues.addCell(cellResultis2)
-                                    // Add ID into ID coloumn in sheet Issues
-                                    sheetIssues.addCell(cellIdResult)
-                                    // Add ID of issue Into list issue.
+                                  if(isIssueExistedInListIssue == false)
+                                  {
+                                    listIssue.add(subject)
+                                    int collumnIndexToWriteIssue2Instance = 2
+                                    log.info("=======Start finding Cell index which doesn't have data yet=======")
+                                    int IndexIssueExcel = 2
+                                    while (!sheetIssues.getCell(1,IndexIssueExcel).getContents().toString().equals(""))
+                                      {
+                                             IndexIssueExcel = IndexIssueExcel + 1
+                                      }
+                                    String idResult = Integer.toString(IndexIssueExcel - 1)
                                     lstIdResult.add(idResult);
-                                    //log list xpath isntance 1 and 2
-                                    log.info(" listXpathInstance.size() is " + listXpathInstance.size())
-                                    log.info("instance" + w +  " in listXpathInstance xpath is " + listXpathInstance.get(w))
-                                    if (listXpathInstance.get(w).equals("null"))
+                                    for (int w = 0; w < locationXMLFileOf2Instance.size(); w++)
                                     {
-                                          cellXpathNull = new Label(collumnIndexToWriteIssue2Instance, IndexIssueExcel, "null")
-                                          collumnIndexToWriteIssue2Instance++
+                                                cellIdResult = new Label(0, IndexIssueExcel, idResult);
+                                                cellResultsubject = new Label(1, IndexIssueExcel,subject);
+                                                sheetIssues.addCell(cellResultsubject)
+                                                // Add ID into ID coloumn in sheet Issues
+                                                sheetIssues.addCell(cellIdResult)
+                                                // Add ID of issue Into list issue.
+                                                //log list xpath isntance 1 and 2
+                                                log.info("instance" + w +  " in listXpathInstance xpath is " + listXpathInstance.get(w))
+                                                if (listXpathInstance.get(w).equals("null"))
+                                                {
+                                                      log.info("start write null to collumn " + collumnIndexToWriteIssue2Instance)
+                                                      cellXpathNull = new Label(collumnIndexToWriteIssue2Instance, IndexIssueExcel, "null")
+                                                      sheetIssues.addCell(cellXpathNull)
+                                                      collumnIndexToWriteIssue2Instance++
+                                                }
+                                              else
+                                                {
+                                                // Parse Xpath to Xml format
+                                                String locationXMLFileOf2InstanceFinal = locationXMLFileOf2Instance.get(w).replace('////', '//');
+                                                File inputFile = new File(locationXMLFileOf2Instance.get(w))
+                                                DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance()
+                                                dbFactory.setNamespaceAware(true)
+                                                DocumentBuilder dBuilder
+                                                dBuilder = dbFactory.newDocumentBuilder()
+                                                Document doc = dBuilder.parse(inputFile)
+                                                XPath xPath =  XPathFactory.newInstance().newXPath()
+                                                String expression = "/" + listXpathInstance.get(w)
+                                                log.info("xpath expression " + w + " " + expression)
+                                                NodeList nodeList = (NodeList) xPath.compile(expression.trim()).evaluate(doc, XPathConstants.NODESET);
+                                                Document newXmlDocument = DocumentBuilderFactory.newInstance()
+                                                        .newDocumentBuilder().newDocument();
+                                                Element root = newXmlDocument.createElement("root")
+                                                newXmlDocument.appendChild(root);
+                                                for (int i = 0; i < nodeList.getLength(); i++)
+                                                 {
+                                                    org.w3c.dom.Node node = nodeList.item(i);
+                                                    org.w3c.dom.Node copyNode = newXmlDocument.importNode(node, true)
+                                                    root.appendChild(copyNode)
+                                                 }
+                                                  // Write XML issue to Excel
+                                                 printXmlDocument(newXmlDocument,sheetIssues, cellFormat, IndexIssueExcel, collumnIndexToWriteIssue2Instance);
+                                                 collumnIndexToWriteIssue2Instance++
+                                                }
                                     }
-                                  else
-                                    {
-                                    // Parse Xpath to Xml format
-                                    String locationXMLFileOf2InstanceFinal = locationXMLFileOf2Instance.get(w).replace('////', '//');
-                                    log.info("====== locationXMLFileOf2Instance.get(w) " + locationXMLFileOf2InstanceFinal +  " ==============")
-                                    File inputFile = new File(locationXMLFileOf2Instance.get(w))
-                                    DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance()
-                                    dbFactory.setNamespaceAware(true)
-                                    DocumentBuilder dBuilder
-                                    dBuilder = dbFactory.newDocumentBuilder()
-                                    Document doc = dBuilder.parse(inputFile)
-                                    log.info("doc " + w + " " + doc)
-                                    XPath xPath =  XPathFactory.newInstance().newXPath()
-                                    String expression = "/" + listXpathInstance.get(w)
-                                    log.info("xpath expression " + w + " " + expression)
-                                    NodeList nodeList = (NodeList) xPath.compile(expression.trim()).evaluate(doc, XPathConstants.NODESET);
-                                    Document newXmlDocument = DocumentBuilderFactory.newInstance()
-                                            .newDocumentBuilder().newDocument();
-                                    Element root = newXmlDocument.createElement("root")
-                                    log.info("root " + w + " " + root)
-                                    newXmlDocument.appendChild(root);
-                                    for (int i = 0; i < nodeList.getLength(); i++)
-                                     {
-                                        org.w3c.dom.Node node = nodeList.item(i);
-                                        log.info("node " + i + " " + node)
-                                        org.w3c.dom.Node copyNode = newXmlDocument.importNode(node, true)
-                                        log.info("copyNode " + i + " " + copyNode)
-                                        root.appendChild(copyNode)
-                                     }
-                                      // Write XML issue to Excel
-                                      //def printXmlDocument(org.w3c.dom.Document document, WritableSheet sheetIssues, WritableCellFormat cellFormat, int indexExcelToWriteData, int Collumn)
-                                     printXmlDocument(newXmlDocument,sheetIssues, cellFormat, IndexIssueExcel, collumnIndexToWriteIssue2Instance);
-                                     collumnIndexToWriteIssue2Instance++
-                                    }
-                        }
-                      }
-                      else
-                      {
-                        lstIdResult.add("" + n);
-                      }
-              }
-              //log check listIssue
-              log.info("***** Check list issue data******")
-              for(int indexListIssue = 0; indexListIssue < listIssue.size(); indexListIssue++ )
-                {
-                  log.info("Data at index " + indexListIssue + " is " + listIssue.get(indexListIssue))
-                }
+                          }
+                  //}
+                  //log check listIssue
+
+                    }
             }
+  }
+              // =================== END REFACTORING=======================
+                                            log.info("***** Check list issue data  ******")
+                              for(int indexListIssue = 0; indexListIssue < listIssue.size(); indexListIssue++ )
+                                {
+                                  log.info("Data at index " + indexListIssue + " is " + listIssue.get(indexListIssue))
+                                }
           }
 }
-}
-            	else
-    			{
-    			   errCompare = temporaryNoteFirstInstance;
-		        temporaryList = mapResult.get("$testStepName")
-		        temporaryList.set(3, temporaryNoteFirstInstance);
-		        mapResult.put("$testStepName", temporaryList)
-		        temporaryNoteFirstInstance = ""
-    			}
+              else
+          {
+             errCompare = temporaryNoteFirstInstance;
+            temporaryList = mapResult.get("$testStepName")
+            temporaryList.set(3, temporaryNoteFirstInstance);
+            mapResult.put("$testStepName", temporaryList)
+            temporaryNoteFirstInstance = ""
+          }
 
-    		  }
+          }
 
     // Write result to ouput Excel file
-	    cellResult = new Label(indexHeaderResult, indexExcel,strFileCompareTestResult);
-	    sheetResult.addCell(cellResult)
-	    if(err == null)
-	    {
-	    		cellResultNotes = new Label(indexHeaderResult + 1, indexExcel, errCompare);
-	    }
-	    else if(strFileCompareTestResult == "BLOCKED")
-	    {
-	    	    //Write notes to the external txt file - Fixed for the maximum characters of Excel cell
-	    		// String testStepNoteFile = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "SPC_testResults" + "//" + "$testStepName" + "_Result_articleRequest_Details_Notes.txt"
-	    		// cellResultNotes = new Label(indexHeaderResult + 1, indexExcel, "Please refer to the TXT note file " + testStepNoteFile.replace("//", "/"));
-          // --------------- NEW----------------
-          	cellResultNotes = new Label(indexHeaderResult + 1, indexExcel, "Blocked at company \"$companyName\", line number $indexExcel, reason: \"$err1 get from the first instance \"$strFirstInstance\"");
-	    }
-          else
-          	{
-          cellResultNotes = new Label(indexHeaderResult + 1, indexExcel, "Please refer to sheet Issues with ID = #" + lstIdResult.toString());
-          	}
-		sheetResult.addCell(cellResultNotes);
+      cellResult = new Label(indexHeaderResult, indexExcel,strFileCompareTestResult);
+      sheetResult.addCell(cellResult)
+      log.info("err ============" + err)
+      log.info("strFileCompareTestResult  ============  " + strFileCompareTestResult)
+      if(err == null)
+      {
+          cellResultNotes = new Label(indexHeaderResult + 1, indexExcel, errCompare);
+      }
+      if(strFileCompareTestResult == "BLOCKED")
+      {
+          // ---=========NEW=========Release 1045 SPC - Refactor the SPC reporting==============
+            cellResultNotes = new Label(indexHeaderResult + 1, indexExcel, "Blocked at company \"$companyName\", line number $indexExcel, reason: \"$err1 get from the first instance \"$strFirstInstance\"");
+      }
+          if(strFileCompareTestResult == "FAILED")
+          {
+            log.info("strFileCompareTestResult = failed + listIssue " + lstIdResult.toString())
+            cellResultNotes = new Label(indexHeaderResult + 1, indexExcel, "Please refer to sheet Issues with ID = #" + lstIdResult.toString());
+          }
+    sheetResult.addCell(cellResultNotes);
 
     log.info " ${text*6} End testing for test Step: $testStepName for company TD No " + companyTDKey + " at Excel data line # " +  indexExcel;
     log.info " ${text*100}";
@@ -1351,32 +1352,32 @@ while(indexRunner < wsdlTestSteps.size())
 
     if(differPercentage >= intLimitOfDifferentPercentage)
     {
-    		perfElapsedTimeDetails = new Label(temporaryIntForPerformanceTestStepDetails, temporaryIndex , temporaryStrPerfElapsedTimeStep, cellFormatHighlight);
+        perfElapsedTimeDetails = new Label(temporaryIntForPerformanceTestStepDetails, temporaryIndex , temporaryStrPerfElapsedTimeStep, cellFormatHighlight);
     }
     else
     {
-    		perfElapsedTimeDetails = new Label(temporaryIntForPerformanceTestStepDetails, temporaryIndex , temporaryStrPerfElapsedTimeStep, cellFormat);
+        perfElapsedTimeDetails = new Label(temporaryIntForPerformanceTestStepDetails, temporaryIndex , temporaryStrPerfElapsedTimeStep, cellFormat);
     }
         sheetPerformance.addCell(perfElapsedTimeDetails);
-	   temporaryIntForPerformanceTestStepDetails = temporaryIntForPerformanceTestStepDetails + 1
+     temporaryIntForPerformanceTestStepDetails = temporaryIntForPerformanceTestStepDetails + 1
 }
 
 if (flagRetrievedPerson == "true")
 {
-	// Write person test data
-	strInstanceToGetPerson = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.retrived.person.whichInstance")
-	strCompanyArticlesRetrievePerson = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("listCompanyArticlesRetrievePerson")
-	listCompanyArticlesRetrievePerson = strCompanyArticlesRetrievePerson.split(',');
-	for (i in 0..(listCompanyArticlesRetrievePerson.size())-1)
-	{
-		varArticle = listCompanyArticlesRetrievePerson[i].toString().trim()
-		if (listNameSteps.contains(varArticle))
-		{
-		def xmlParser = new XmlParser()
-        	if(strInstanceToGetPerson == "1")
-        	{
-        			temporaryXmlFile = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_temporaryXMLFile_FirstInstance" + "//" + "temporarely_First_XML_Response_" + "$testCase.name" + "_" + "$varArticle" + ".xml"
-        			Node nodeFirstResponse = xmlParser.parse(temporaryXmlFile);
+  // Write person test data
+  strInstanceToGetPerson = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.retrived.person.whichInstance")
+  strCompanyArticlesRetrievePerson = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("listCompanyArticlesRetrievePerson")
+  listCompanyArticlesRetrievePerson = strCompanyArticlesRetrievePerson.split(',');
+  for (i in 0..(listCompanyArticlesRetrievePerson.size())-1)
+  {
+    varArticle = listCompanyArticlesRetrievePerson[i].toString().trim()
+    if (listNameSteps.contains(varArticle))
+    {
+    def xmlParser = new XmlParser()
+          if(strInstanceToGetPerson == "1")
+          {
+              temporaryXmlFile = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_temporaryXMLFile_FirstInstance" + "//" + "temporarely_First_XML_Response_" + "$testCase.name" + "_" + "$varArticle" + ".xml"
+              Node nodeFirstResponse = xmlParser.parse(temporaryXmlFile);
                     String strFirstResponse = XmlUtil.serialize(nodeFirstResponse);
                     xmlFileResponse = xmlParser.parseText(strFirstResponse);
                     def nodeXmlResponsePerson = xmlFileResponse.'**'.findAll{ node-> node.name() == "person"};
@@ -1432,14 +1433,14 @@ if (flagRetrievedPerson == "true")
                         }
                       }
                     }
-        		}
-        		else if(strInstanceToGetPerson == "2")
-        		{
-        			responseXmlHolder = groovyUtils.getXmlHolder("$varArticle#Response");
-          		secondResponse = responseXmlHolder.getXml()
-         			xmlSecondResponse = xmlParser.parseText(secondResponse)
+            }
+            else if(strInstanceToGetPerson == "2")
+            {
+              responseXmlHolder = groovyUtils.getXmlHolder("$varArticle#Response");
+              secondResponse = responseXmlHolder.getXml()
+              xmlSecondResponse = xmlParser.parseText(secondResponse)
 
-         			def nodeXmlResponsePerson = xmlSecondResponse.'**'.findAll{ node-> node.name() == "person"};
+              def nodeXmlResponsePerson = xmlSecondResponse.'**'.findAll{ node-> node.name() == "person"};
                     def limitPerson = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.limited.person").toInteger();
                     nodeXmlResponsePerson.each{
                         if(limitPerson > 0)
@@ -1467,18 +1468,18 @@ if (flagRetrievedPerson == "true")
                                 }
                                 if(firstName != "")
                                 {
-                                	if (com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.instance2ArticleRequestID") == "OFWI_ID")
-                                	{
-                                		cellIDTestDataPerson = new Label(0, indexExelOutputTestDataPerson, personID);
-                                		}
-                                		else if (com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.instance2ArticleRequestID") == "TD_KEY")
-                                		{
-                                			cellIDTestDataPerson = new Label(8, indexExelOutputTestDataPerson, personID);
-                                			}
-                                			else if (com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.instance2ArticleRequestID") == "CRIFID_COREDB")
-                                			{
-                                				cellIDTestDataPerson = new Label(9, indexExelOutputTestDataPerson, personID);
-                                				}
+                                  if (com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.instance2ArticleRequestID") == "OFWI_ID")
+                                  {
+                                    cellIDTestDataPerson = new Label(0, indexExelOutputTestDataPerson, personID);
+                                    }
+                                    else if (com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.instance2ArticleRequestID") == "TD_KEY")
+                                    {
+                                      cellIDTestDataPerson = new Label(8, indexExelOutputTestDataPerson, personID);
+                                      }
+                                      else if (com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.instance2ArticleRequestID") == "CRIFID_COREDB")
+                                      {
+                                        cellIDTestDataPerson = new Label(9, indexExelOutputTestDataPerson, personID);
+                                        }
 
                                 cellFirstNameTestDataPerson = new Label(1, indexExelOutputTestDataPerson, firstName);
                                 cellLastNameTestDataPerson = new Label(2, indexExelOutputTestDataPerson, lastName);
@@ -1505,14 +1506,14 @@ if (flagRetrievedPerson == "true")
                       }
                     }
 
-        		}
-        		else
-        		{
-        			log.warn (" ${text*9} " + "=== The decided instance to get person data is not defined or it is incorrect. Please check the property file ===")
-        		}
+            }
+            else
+            {
+              log.warn (" ${text*9} " + "=== The decided instance to get person data is not defined or it is incorrect. Please check the property file ===")
+            }
 
-		}
-	}
+    }
+  }
 }
 // Write the number of pass-fail-warning-block
 temporaryIntForMap = 0
@@ -1527,50 +1528,49 @@ while(temporaryIntForMap < wsdlTestSteps.size())
     perfTestSteps =  new Label(0, indexTempRowReportSummaryOfTestStep, "$testStepName", cellFormat)
     sheetSummary.addCell(summaryTestSteps);
     sheetPerformance.addCell(perfTestSteps);
-
-	List listTestResultOutput = mapResult.get("$testStepName")
-	String noPass = listTestResultOutput.get(0).toString()
-	int intnoPass = listTestResultOutput.get(0)
-	String noFail = listTestResultOutput.get(1).toString()
-	int intnoFail = listTestResultOutput.get(1)
-	String noBlock = listTestResultOutput.get(2).toString()
-	int intnoBlock = listTestResultOutput.get(2)
-	String detectedNote = listTestResultOutput.get(3).toString()
+  List listTestResultOutput = mapResult.get("$testStepName")
+  String noPass = listTestResultOutput.get(0).toString()
+  int intnoPass = listTestResultOutput.get(0)
+  String noFail = listTestResultOutput.get(1).toString()
+  int intnoFail = listTestResultOutput.get(1)
+  String noBlock = listTestResultOutput.get(2).toString()
+  int intnoBlock = listTestResultOutput.get(2)
+  String detectedNote = listTestResultOutput.get(3).toString()
 
         long llapsedTime1st = listTestResultOutput.get(4)
     long llapsedTime2nd = listTestResultOutput.get(5)
 
     // Calculate the elapsed time for the first instance
-	long secondInMillis1st = 1000;
-	long minuteInMillis1st = secondInMillis1st * 60;
-	long hourInMillis1st = minuteInMillis1st * 60;
-	long dayInMillis1st = hourInMillis1st * 24;
-	long elapsedDays1st = llapsedTime1st / dayInMillis1st;
-	llapsedTime1st = llapsedTime1st % dayInMillis1st;
-	long elapsedHours1st = llapsedTime1st / hourInMillis1st;
-	llapsedTime1st = llapsedTime1st % hourInMillis1st;
-	long elapsedMinutes1st = llapsedTime1st / minuteInMillis1st;
-	llapsedTime1st = llapsedTime1st % minuteInMillis1st;
-	long elapsedSeconds1st = llapsedTime1st / secondInMillis1st;
-	llapsedTime1st = llapsedTime1st % secondInMillis1st;
-	long elapsedMilliSeconds1st = llapsedTime1st % secondInMillis1st;
-	String elapsedTimeOutput1st = elapsedDays1st + "d " + elapsedHours1st + "h " + elapsedMinutes1st + "m " + elapsedSeconds1st + "s+" + elapsedMilliSeconds1st + "ms"
+  long secondInMillis1st = 1000;
+  long minuteInMillis1st = secondInMillis1st * 60;
+  long hourInMillis1st = minuteInMillis1st * 60;
+  long dayInMillis1st = hourInMillis1st * 24;
+  long elapsedDays1st = llapsedTime1st / dayInMillis1st;
+  llapsedTime1st = llapsedTime1st % dayInMillis1st;
+  long elapsedHours1st = llapsedTime1st / hourInMillis1st;
+  llapsedTime1st = llapsedTime1st % hourInMillis1st;
+  long elapsedMinutes1st = llapsedTime1st / minuteInMillis1st;
+  llapsedTime1st = llapsedTime1st % minuteInMillis1st;
+  long elapsedSeconds1st = llapsedTime1st / secondInMillis1st;
+  llapsedTime1st = llapsedTime1st % secondInMillis1st;
+  long elapsedMilliSeconds1st = llapsedTime1st % secondInMillis1st;
+  String elapsedTimeOutput1st = elapsedDays1st + "d " + elapsedHours1st + "h " + elapsedMinutes1st + "m " + elapsedSeconds1st + "s+" + elapsedMilliSeconds1st + "ms"
 
-    	// Calculate the elapsed time for the second instance
-	long secondInMillis2nd = 1000;
-	long minuteInMillis2nd = secondInMillis2nd * 60;
-	long hourInMillis2nd = minuteInMillis2nd * 60;
-	long dayInMillis2nd = hourInMillis2nd * 24;
-	long elapsedDays2nd = llapsedTime2nd / dayInMillis2nd;
-	llapsedTime2nd = llapsedTime2nd % dayInMillis2nd;
-	long elapsedHours2nd = llapsedTime2nd / hourInMillis2nd;
-	llapsedTime2nd = llapsedTime2nd % hourInMillis2nd;
-	long elapsedMinutes2nd = llapsedTime2nd / minuteInMillis2nd;
-	llapsedTime2nd = llapsedTime2nd % minuteInMillis2nd;
-	long elapsedSeconds2nd = llapsedTime2nd / secondInMillis2nd;
-	llapsedTime2nd = llapsedTime2nd % secondInMillis2nd;
-	long elapsedMilliSeconds2nd = llapsedTime2nd % secondInMillis2nd;
-	String elapsedTimeOutput2nd = elapsedDays2nd + "d " + elapsedHours2nd + "h " + elapsedMinutes2nd + "m " + elapsedSeconds2nd + "s+" + elapsedMilliSeconds2nd + "ms"
+      // Calculate the elapsed time for the second instance
+  long secondInMillis2nd = 1000;
+  long minuteInMillis2nd = secondInMillis2nd * 60;
+  long hourInMillis2nd = minuteInMillis2nd * 60;
+  long dayInMillis2nd = hourInMillis2nd * 24;
+  long elapsedDays2nd = llapsedTime2nd / dayInMillis2nd;
+  llapsedTime2nd = llapsedTime2nd % dayInMillis2nd;
+  long elapsedHours2nd = llapsedTime2nd / hourInMillis2nd;
+  llapsedTime2nd = llapsedTime2nd % hourInMillis2nd;
+  long elapsedMinutes2nd = llapsedTime2nd / minuteInMillis2nd;
+  llapsedTime2nd = llapsedTime2nd % minuteInMillis2nd;
+  long elapsedSeconds2nd = llapsedTime2nd / secondInMillis2nd;
+  llapsedTime2nd = llapsedTime2nd % secondInMillis2nd;
+  long elapsedMilliSeconds2nd = llapsedTime2nd % secondInMillis2nd;
+  String elapsedTimeOutput2nd = elapsedDays2nd + "d " + elapsedHours2nd + "h " + elapsedMinutes2nd + "m " + elapsedSeconds2nd + "s+" + elapsedMilliSeconds2nd + "ms"
 
     perfTotalElapsedTime1st = new Label(2, indexTempRowReportSummaryOfTestStep, elapsedTimeOutput1st, cellFormat)
     perfTotalElapsedTime2nd = new Label(3, indexTempRowReportSummaryOfTestStep, elapsedTimeOutput2nd, cellFormat)
@@ -1584,7 +1584,7 @@ while(temporaryIntForMap < wsdlTestSteps.size())
     summaryNoOfBlockValue = new Label(4, indexTempRowReportSummaryOfTestStep, noBlock, cellFormat);
     sheetSummary.addCell(summaryNoOfBlockValue);
 
-	int intNoOfTested = intnoPass + intnoFail + intnoBlock
+  int intNoOfTested = intnoPass + intnoFail + intnoBlock
     summaryNoOfTestedValue = new Label(1, indexTempRowReportSummaryOfTestStep, intNoOfTested.toString(), cellFormat)
     perfNoOfTestedValue = new Label(1, indexTempRowReportSummaryOfTestStep, intNoOfTested.toString(), cellFormat)
     sheetSummary.addCell(summaryNoOfTestedValue);
@@ -1592,15 +1592,16 @@ while(temporaryIntForMap < wsdlTestSteps.size())
 
     if(noFail.toInteger() == 0 && noBlock.toInteger() == 0)
     {
-    		summaryNoteValue = new Label(5, indexTempRowReportSummaryOfTestStep, "Functions work well", cellFormat);
+        summaryNoteValue = new Label(5, indexTempRowReportSummaryOfTestStep, "Functions work well", cellFormat);
     }
     else
     {
-    	    //Write notes to the external txt file - Fixed for the maximum characters of Excel cell
-    		String testStepNoteFile = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "SPC_testResults" + "//" + "$testStepName" + "_Result_articleRequest_Details_Notes.txt"
-    		File fileNote = new File(testStepNoteFile)
-    		fileNote.write(detectedNote);
-    		summaryNoteValue = new Label(5, indexTempRowReportSummaryOfTestStep, "Please refer to the TXT note file " + testStepNoteFile.replace("//", "/"), cellFormat);
+          //Write notes to the external txt file - Fixed for the maximum characters of Excel cell
+//        String testStepNoteFile = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "SPC_testResults" + "//" + "$testStepName" + "_Result_articleRequest_Details_Notes.txt"
+//        File fileNote = new File(testStepNoteFile)
+//        fileNote.write(detectedNote);
+//        summaryNoteValue = new Label(5, indexTempRowReportSummaryOfTestStep, "Please refer to the TXT note file " + testStepNoteFile.replace("//", "/"), cellFormat);
+        summaryNoteValue = new Label(5, indexTempRowReportSummaryOfTestStep, "Please refer to sheet 'Detailed' for more detail", cellFormat);
     }
     sheetSummary.addCell(summaryNoteValue);
 
@@ -1703,7 +1704,7 @@ sheetPerformance.addCell(perfTotalElapsedTimeValue);
       //def printXmlDocument(org.w3c.dom.Document document, WritableSheet sheetIssues, WritableCellFormat cellFormat, int indexExcelToWriteData, int Collumn)
          def printXmlDocument(org.w3c.dom.Document document, WritableSheet sheetIssues, WritableCellFormat cellFormat, int indexExcelToWriteData, int Collumn)
          {
-         	log.info("======Start to write block issue in xml format to Excel file========== ")
+          log.info("======Start to write block issue in xml format to Excel file========== ")
             DOMImplementationLS domImplementationLS = (DOMImplementationLS) document
                 .getImplementation();
             LSSerializer lsSerializer = domImplementationLS.createLSSerializer();
@@ -1727,8 +1728,8 @@ excelResult.close();
 
 if(workbookTestDataPerson != null)
 {
-	workbookTestDataPerson.write();
-	workbookTestDataPerson.close();
+  workbookTestDataPerson.write();
+  workbookTestDataPerson.close();
 }
 
 //Backup test result file
@@ -1747,82 +1748,82 @@ log.info " ${star*400}";
 
 String getErrorMessageCompare(List differences)
 {
-	String errCompare = "";
-	for(Object object: differences)
-	{
-		errCompare += "\n";
-		Difference difference = (Difference)object;
-		NodeDetail controlNodeDetail = difference.getControlNodeDetail();
-		NodeDetail testNodeDetail = difference.getTestNodeDetail();
-		if(!difference.isRecoverable())
-		{
-			errCompare += "[different] - ";
-		}
-		else
-		{
-			errCompare += "[not identical] - ";
-		}
+  String errCompare = "";
+  for(Object object: differences)
+  {
+    errCompare += "\n";
+    Difference difference = (Difference)object;
+    NodeDetail controlNodeDetail = difference.getControlNodeDetail();
+    NodeDetail testNodeDetail = difference.getTestNodeDetail();
+    if(!difference.isRecoverable())
+    {
+      errCompare += "[different] - ";
+    }
+    else
+    {
+      errCompare += "[not identical] - ";
+    }
 
-		org.w3c.dom.Node controlNode = controlNodeDetail.getNode();
-		org.w3c.dom.Node testNode = testNodeDetail.getNode();
-		if (controlNodeDetail.getNode()!=null && controlNodeDetail.getNode().getNodeType() == org.w3c.dom.Node.TEXT_NODE)
-		{
-		    controlNode = controlNodeDetail.getNode().getParentNode();
-		}
-		if (testNodeDetail.getNode()!=null && testNodeDetail.getNode().getNodeType() == org.w3c.dom.Node.TEXT_NODE)
-		{
-		    testNode = testNodeDetail.getNode().getParentNode();
-		}
+    org.w3c.dom.Node controlNode = controlNodeDetail.getNode();
+    org.w3c.dom.Node testNode = testNodeDetail.getNode();
+    if (controlNodeDetail.getNode()!=null && controlNodeDetail.getNode().getNodeType() == org.w3c.dom.Node.TEXT_NODE)
+    {
+        controlNode = controlNodeDetail.getNode().getParentNode();
+    }
+    if (testNodeDetail.getNode()!=null && testNodeDetail.getNode().getNodeType() == org.w3c.dom.Node.TEXT_NODE)
+    {
+        testNode = testNodeDetail.getNode().getParentNode();
+    }
 
-		String nodeName = null;
-		String controlNodeContent = null;
-		String testNodeContent = null;
-		if(controlNode != null)
-		{
-			nodeName = controlNode.getNodeName();
-			controlNodeContent = controlNode.getTextContent();
-		}
-		if(testNode != null)
-		{
-			testNodeContent = testNode.getTextContent();
-		}
-		errCompare += difference.getDescription() +" of \"" + nodeName + "\".";
-		if(difference.getId() != org.custommonkey.xmlunit.DifferenceConstants.CHILD_NODELIST_LENGTH)
-		{
-			if (controlNodeDetail.getValue().trim().length() > 0 && testNodeDetail.getValue().trim().length() > 0)
-			{
-				errCompare += " Expected \"" + controlNodeDetail.getValue() + "\" but \"" + testNodeDetail.getValue() +"\"";
-			}
-		}
-		else if(difference.getId() != org.custommonkey.xmlunit.DifferenceConstants.CHILD_NODE_NOT_FOUND_ID)
-		{
-			errCompare += " Expected \"" + controlNodeContent + "\" but \"" + testNodeContent +"\"";
-		}
-		errCompare += "\n           At \"" + controlNodeDetail.getXpathLocation() + "\" and \"" + testNodeDetail.getXpathLocation() +"\"";
-		errCompare += "\n\n           " + printNode(controlNode);
-		errCompare += "\n\n           " + printNode(testNode);
-	}
-	return errCompare;
+    String nodeName = null;
+    String controlNodeContent = null;
+    String testNodeContent = null;
+    if(controlNode != null)
+    {
+      nodeName = controlNode.getNodeName();
+      controlNodeContent = controlNode.getTextContent();
+    }
+    if(testNode != null)
+    {
+      testNodeContent = testNode.getTextContent();
+    }
+    errCompare += difference.getDescription() +" of \"" + nodeName + "\".";
+    if(difference.getId() != org.custommonkey.xmlunit.DifferenceConstants.CHILD_NODELIST_LENGTH)
+    {
+      if (controlNodeDetail.getValue().trim().length() > 0 && testNodeDetail.getValue().trim().length() > 0)
+      {
+        errCompare += " Expected \"" + controlNodeDetail.getValue() + "\" but \"" + testNodeDetail.getValue() +"\"";
+      }
+    }
+    else if(difference.getId() != org.custommonkey.xmlunit.DifferenceConstants.CHILD_NODE_NOT_FOUND_ID)
+    {
+      errCompare += " Expected \"" + controlNodeContent + "\" but \"" + testNodeContent +"\"";
+    }
+    errCompare += "\n           At \"" + controlNodeDetail.getXpathLocation() + "\" and \"" + testNodeDetail.getXpathLocation() +"\"";
+    errCompare += "\n\n           " + printNode(controlNode);
+    errCompare += "\n\n           " + printNode(testNode);
+  }
+  return errCompare;
 }
 
 
 String printNode(org.w3c.dom.Node nodeInput)
 {
-	if (nodeInput != null)
+  if (nodeInput != null)
         {
-        	org.w3c.dom.Node node = nodeInput;
+          org.w3c.dom.Node node = nodeInput;
         if (nodeInput.getNodeType() == org.w3c.dom.Node.ATTRIBUTE_NODE) {
-        	node = nodeInput.getOwnerElement();
+          node = nodeInput.getOwnerElement();
         }
      StringWriter sw = new StringWriter();
      try {
-     	Transformer t = TransformerFactory.newInstance().newTransformer();
-     	t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-     	t.transform(new DOMSource(node), new StreamResult(sw));
+      Transformer t = TransformerFactory.newInstance().newTransformer();
+      t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+      t.transform(new DOMSource(node), new StreamResult(sw));
      } catch (TransformerException te) {
 
      }
-     	return sw.toString();
+      return sw.toString();
      }
         return null;
 }
@@ -1851,16 +1852,3 @@ String printNode(org.w3c.dom.Node nodeInput)
          }
          return output;
         }
-
-//         def printXmlDocument(org.w3c.dom.Document document,WritableSheet sheetIssues)
-//         {
-//            DOMImplementationLS domImplementationLS = (DOMImplementationLS) document
-//                .getImplementation();
-//            LSSerializer lsSerializer = domImplementationLS.createLSSerializer();
-//             String string = lsSerializer.writeToString(document);
-//             log.info("Print xml document is      " + string)
-////             Label cellResultNotesHai = null;
-////             cellResultNotesHai = new Label(5, 5, string);
-//			cellResultNotesHai = new Label(5, 5, "linh xinh dep");
-//             sheetIssues.addCell(cellResultNotesHai);
-//          }
