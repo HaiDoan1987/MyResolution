@@ -1597,10 +1597,6 @@ while(temporaryIntForMap < wsdlTestSteps.size())
     else
     {
           //Write notes to the external txt file - Fixed for the maximum characters of Excel cell
-//        String testStepNoteFile = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "SPC_testResults" + "//" + "$testStepName" + "_Result_articleRequest_Details_Notes.txt"
-//        File fileNote = new File(testStepNoteFile)
-//        fileNote.write(detectedNote);
-//        summaryNoteValue = new Label(5, indexTempRowReportSummaryOfTestStep, "Please refer to the TXT note file " + testStepNoteFile.replace("//", "/"), cellFormat);
         summaryNoteValue = new Label(5, indexTempRowReportSummaryOfTestStep, "Please refer to sheet 'Detailed' for more detail", cellFormat);
     }
     sheetSummary.addCell(summaryNoteValue);
