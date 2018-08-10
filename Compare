@@ -705,7 +705,11 @@ while(indexRunner < wsdlTestSteps.size())
         temporaryNoteFirstInstance = "Blocked at company \"$companyName\", line number $indexExcel, reason: \"$err1 get from the first instance \"$strFirstInstance\""
         log.info("temporaryList in if(!validResponse) = " +  temporaryList.get(2) + 1 )
 <<<<<<< HEAD
+<<<<<<< HEAD
      int temporaryInt = temporaryList.get(2) + 1
+=======
+	   int temporaryInt = temporaryList.get(2) + 1
+>>>>>>> ecd61ba5be441d38b1a327c28a4bf1de9e432183
 =======
 	   int temporaryInt = temporaryList.get(2) + 1
 >>>>>>> ecd61ba5be441d38b1a327c28a4bf1de9e432183
@@ -1159,6 +1163,7 @@ while(indexRunner < wsdlTestSteps.size())
                      else
                      {
 <<<<<<< HEAD
+<<<<<<< HEAD
           errCompare = getErrorMessageCompare(differences);
                      log.error " ${text*9} Compare XML files - Result testing for testStep $testStepName : ------>>>>>> FAILED due to the missmatch error " + errCompare;
                      temporaryList = mapResult.get("$testStepName")
@@ -1373,6 +1378,8 @@ while(indexRunner < wsdlTestSteps.size())
             temporaryNoteFirstInstance = ""
           }
 =======
+=======
+>>>>>>> ecd61ba5be441d38b1a327c28a4bf1de9e432183
 					errCompare = getErrorMessageCompare(differences);
 	                   log.error " ${text*9} Compare XML files - Result testing for testStep $testStepName : ------>>>>>> FAILED due to the missmatch error " + errCompare;
 	                   temporaryList = mapResult.get("$testStepName")
@@ -1855,6 +1862,7 @@ while(temporaryIntForMap < wsdlTestSteps.size())
     sheetSummary.addCell(summaryTestSteps);
     sheetPerformance.addCell(perfTestSteps);
 <<<<<<< HEAD
+<<<<<<< HEAD
   List listTestResultOutput = mapResult.get("$testStepName")
   String noPass = listTestResultOutput.get(0).toString()
   int intnoPass = listTestResultOutput.get(0)
@@ -1864,6 +1872,8 @@ while(temporaryIntForMap < wsdlTestSteps.size())
   int intnoBlock = listTestResultOutput.get(2)
   String detectedNote = listTestResultOutput.get(3).toString()
 =======
+=======
+>>>>>>> ecd61ba5be441d38b1a327c28a4bf1de9e432183
 	List listTestResultOutput = mapResult.get("$testStepName")
 	String noPass = listTestResultOutput.get(0).toString()
 	int intnoPass = listTestResultOutput.get(0)
@@ -1947,6 +1957,9 @@ while(temporaryIntForMap < wsdlTestSteps.size())
 //    		fileNote.write(detectedNote);
 //    		summaryNoteValue = new Label(5, indexTempRowReportSummaryOfTestStep, "Please refer to the TXT note file " + testStepNoteFile.replace("//", "/"), cellFormat);
     		summaryNoteValue = new Label(5, indexTempRowReportSummaryOfTestStep, "Please refer to sheet 'Detailed' for more detail", cellFormat);
+<<<<<<< HEAD
+>>>>>>> ecd61ba5be441d38b1a327c28a4bf1de9e432183
+=======
 >>>>>>> ecd61ba5be441d38b1a327c28a4bf1de9e432183
     }
     sheetSummary.addCell(summaryNoteValue);
