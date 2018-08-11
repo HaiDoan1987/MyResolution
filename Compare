@@ -1198,12 +1198,12 @@ while(indexRunner < wsdlTestSteps.size())
                             log.info("instance2 ===========" + xpathInstance2);
                             // ==========new==========release v2 1045 SPC - Refactor the SPC reporting=======
 					if (lstUnknowIssue.size() > 0)
-					{
-						testResult = false;
-            				strFileCompareTestResult = "BLOCKED"
-            				err1 = issue
-            				break
-         }
+						{
+							testResult = false;
+	            				strFileCompareTestResult = "BLOCKED"
+	            				err1 = issue
+	            				break
+	                    }
 						else
 						{
                         // add instance 1 xpath and instance 2 xpath to listXpath
@@ -1290,6 +1290,31 @@ while(indexRunner < wsdlTestSteps.size())
                                                 String expression = "/" + listXpathInstance.get(w)
                                                 //10-08 6:45 pm Improve write node - Hải
                                                 ///Envelope[1]/Body[1]/response[1]/artikelList[1]/artikel[1]/party[1]/address[1]/city[1]/text()[1]
+										                                                /* List<String> test = new ArrayList<String>();
+										        String xpath = "/artikelList[1]/artikel[1]/party[1]/address[1]/city[1]/text()[1]";
+										        String cutdown;
+										        int step = 0;
+										        int indexOfStringText = 0;
+										        for(int i = 0; i < xpath.length(); i++)
+										        {
+
+										            int stopCut = indexOfStringText + xpath.indexOf("]" , indexOfStringText) + 1;
+										            cutdown  = xpath.substring(indexOfStringText, stopCut);
+										            xpath  = xpath.substring(stopCut, xpath.length());
+										            test.add(cutdown);
+										            //indexOfStringText = stopCut;
+										            i = stopCut;
+										            System.out.println(" at step = " +  step + " list test  = " +  test);
+										            step++;
+										        }
+										        xpath ="";
+										        
+										        for (int m = 0; m < test.size() - 2; m++)
+										        {
+										            xpath = xpath + "/" + test.get(m);
+										        }
+										        System.out.println(" new xpath = " + xpath);
+                                                */
                                                 if (expression.contains("text()"))
                                                   {
                                                     expression = expression.substring(0, expression.indexOf("/text()"))
@@ -1312,8 +1337,6 @@ while(indexRunner < wsdlTestSteps.size())
                                                 }
                                     }
                           }
-                  //}
-                  //log check listIssue
                   // ==========new==========release v2 1045 SPC - Refactor the SPC reporting=======
                         }
                     }
