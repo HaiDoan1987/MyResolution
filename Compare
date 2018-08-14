@@ -86,6 +86,11 @@ if( !folderTestResult.exists() )
   folderTestResult.mkdirs()
 }
 
+// ========================== Method ========================
+
+//=====================================
+
+
 // Declare variables
 def groovyUtils = new com.eviware.soapui.support.GroovyUtils( context )
 def holder, p, p1, result, xmlDiff
@@ -189,6 +194,7 @@ sheetIssues.setColumnView(2, cell);
 sheetIssues.setColumnView(3, cell);
 
 //Write Summary information
+
 Label summaryTestResult = new Label(0, 0, "Swiss Platform Consolidation - Summary Test Result", cellFormatBold);
 Label summaryTestCase = new Label(0, 1, "Test Case", cellFormat);
 Label summaryTestCaseValue = new Label(1, 1, "$testCase.name", cellFormat);
@@ -300,6 +306,95 @@ sheetIssues.addCell(issueID);
 sheetIssues.addCell(issueFirstInstance);
 sheetIssues.addCell(issueSecondInstance);
 sheetIssues.addCell(issueSubject);
+
+// declare methods
+		// remove non character and non number
+	  String removeUnwantedCharacters( String xpathNeedToBeConverted)
+  {
+		  log.info("start remove unWantedCharacter for String " + xpathNeedToBeConverted)
+            String cutdown;
+            int step = 0;
+            int indexOfStringText = 0;
+            int stopCut = 0;
+            String newXpath = ""
+            for(int indexExpression = 0; indexExpression < xpathNeedToBeConverted.length(); indexExpression++)
+            {
+
+                stopCut = indexOfStringText + xpathNeedToBeConverted.indexOf("]" , indexOfStringText) + 1;
+                cutdown  = xpathNeedToBeConverted.substring(indexOfStringText, stopCut);
+                xpathNeedToBeConverted  = xpathNeedToBeConverted.substring(stopCut, xpathNeedToBeConverted.length());
+                if ((cutdown.contains("artikel[")))
+                {
+				          cutdown = cutdown.replaceAll("[^0-9a-zA-Z]+", "")
+                }
+                else
+                {
+                	cutdown = cutdown.replaceAll("[^a-zA-Z]+", "")
+                }
+                if (cutdown.contains("text"))
+                {
+                	break;
+                }
+                log.info("cut down is " + cutdown)
+                indexExpression = stopCut;
+                newXpath = newXpath + "/" + cutdown ;
+            }
+            log.info("new xpath after removing unwanted characters " + newXpath)
+            return newXpath
+  }
+  //Convert xpath to a list string node
+  List<String> convertXpathToListNodes(String xpath)
+    {
+      List<String> listNodes = new ArrayList<String>();
+      String cutdown;
+      int indexOfStringText = 0;
+      int stopCut = 0;
+      for(int indexExpression = 0; indexExpression < xpath.length(); indexExpression++)
+      {
+
+          stopCut = indexOfStringText + xpath.indexOf("]" , indexOfStringText) + 1;
+          cutdown  = xpath.substring(indexOfStringText, stopCut);
+          xpath  = xpath.substring(stopCut, xpath.length());
+          listNodes.add(cutdown);
+          //indexOfStringText = stopCut;
+          indexExpression = stopCut;
+      }
+      return listNodes;
+    }
+    // convert xpath to document Xml format
+    Document parseXpathToXmlFormat(String fileLocation, String Xpath, int removeNodes)
+    {
+      List<String> listNodes = convertXpathToListNodes(Xpath)
+      File inputFile = new File(fileLocation)
+      DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance()
+      dbFactory.setNamespaceAware(true)
+      DocumentBuilder dBuilder
+      dBuilder = dbFactory.newDocumentBuilder()
+      Document doc = dBuilder.parse(inputFile)
+      XPath xPath =  XPathFactory.newInstance().newXPath()
+      log.info("list node is " + listNodes)
+      Xpath ="";
+      int indexParentNode = listNodes.size() - removeNodes
+      for (int m = 0; m < listNodes.size() - removeNodes ; m++)
+      {
+          Xpath = Xpath + listNodes.get(m);
+      }
+      log.info("xpath expression " + Xpath)
+      NodeList nodeList = (NodeList) xPath.compile(Xpath.trim()).evaluate(doc, XPathConstants.NODESET);
+      Document newXmlDocument = DocumentBuilderFactory.newInstance()
+              .newDocumentBuilder().newDocument();
+      String rootName = listNodes.get(indexParentNode -2).replaceAll("[^a-zA-Z]+", "")
+      Element root = newXmlDocument.createElement(rootName)
+      newXmlDocument.appendChild(root);
+      for (int i = 0; i < nodeList.getLength(); i++)
+       {
+          org.w3c.dom.Node node = nodeList.item(i);
+          org.w3c.dom.Node copyNode = newXmlDocument.importNode(node, true)
+          root.appendChild(copyNode)
+       }
+       return newXmlDocument
+    }
+//=================================
 
 
 // Get all test steps
@@ -511,6 +606,8 @@ if (Arrays.asList(lstInstanceRequestID).contains(strInstance1ArticleRequestID) =
   return null
 }
 
+List xpathIssueOfExpectedValue = new ArrayList<String>();
+List nodesOfIssueXpath = new ArrayList<String>();
 
 while (indexExcel <= 30)
 {
@@ -1104,7 +1201,7 @@ while(indexRunner < wsdlTestSteps.size())
                      }
                      else
                      {
-          		 errCompare = getErrorMessageCompare(differences);
+               errCompare = getErrorMessageCompare(differences);
                      log.error " ${text*9} Compare XML files - Result testing for testStep $testStepName : ------>>>>>> FAILED due to the missmatch error " + errCompare;
                      temporaryList = mapResult.get("$testStepName")
                      int temporaryInt = temporaryList.get(1) + 1
@@ -1136,11 +1233,12 @@ while(indexRunner < wsdlTestSteps.size())
                 // ==============REFACTOR GET SUBJECT/XPATH1/XPATH2===============
             for(int j = 0; j <= differences.size()-1; j++)
             {
-            	// ==========new==========release v2 1045 SPC - Refactor the SPC reporting=======
-			        List lstUnknowIssue = [];
+              // ==========new==========release v2 1045 SPC - Refactor the SPC reporting=======
+              List lstUnknowIssue = [];
               List listXpathInstance = [];
               List locationXMLFileOf2Instance = [];
               Difference difference;
+
               difference = differences.get(j);
               if (!difference.isRecoverable())
               {
@@ -1166,7 +1264,7 @@ while(indexRunner < wsdlTestSteps.size())
                                 // ==========new==========release v2 1045 SPC - Refactor the SPC reporting=======
                                 else if (!tempxpathInstance1.contains("/artikelList[1]"))
                                 {
-                                	lstUnknowIssue.add(tempxpathInstance1);
+                                  lstUnknowIssue.add(tempxpathInstance1);
                                 }
                                 else
                                 {
@@ -1188,7 +1286,7 @@ while(indexRunner < wsdlTestSteps.size())
                               // ==========new==========release v2 1045 SPC - Refactor the SPC reporting=======
                                 else if (!tempxpathInstance2.contains("/artikelList[1]"))
                                 {
-                                	lstUnknowIssue.add(tempxpathInstance2);
+                                  lstUnknowIssue.add(tempxpathInstance2);
                                 }
                               else
                               {
@@ -1196,16 +1294,48 @@ while(indexRunner < wsdlTestSteps.size())
                               }
                             }
                             log.info("instance2 ===========" + xpathInstance2);
+                            String tempXpath = ""
+                            boolean isXpathExistedInListNode = true;
+                            if(subject.contains("Expected text value"))
+                            {
+                              isXpathExistedInListNode = false
+                               tempXpath = removeUnwantedCharacters(xpathInstance1)
+                               log.info("tempXpath" + nodesOfIssueXpath)
+                               if (nodesOfIssueXpath.size()==0 )
+                               	{
+                               		nodesOfIssueXpath.add(tempXpath)
+                               	}
+                               else
+	                               {
+	                                   for (int indexListNodesOfIssueXpath = 0; indexListNodesOfIssueXpath <  nodesOfIssueXpath.size(); indexListNodesOfIssueXpath++ )
+			                               {
+                                        log.info("==== start to compare new xpath " + tempXpath + " with xpath at index " + indexListNodesOfIssueXpath + " " + nodesOfIssueXpath.get(indexListNodesOfIssueXpath) )
+                                        if (tempXpath.equals(nodesOfIssueXpath.get(indexListNodesOfIssueXpath)))
+                                        {
+                                            isXpathExistedInListNode = true
+                                            break
+                                        }
+                                        isXpathExistedInListNode = false
+			                               }
+			                         if (isXpathExistedInListNode == false)
+			                         {
+			                            nodesOfIssueXpath.add(tempXpath)
+			                         }
+
+                               log.info("nodesOfIssueXpath  " + nodesOfIssueXpath)
+                            }
+                          }
+
                             // ==========new==========release v2 1045 SPC - Refactor the SPC reporting=======
-					if (lstUnknowIssue.size() > 0)
-						{
-							testResult = false;
-	            				strFileCompareTestResult = "BLOCKED"
-	            				err1 = issue
-	            				break
-	                    }
-						else
-						{
+                      if (lstUnknowIssue.size() > 0)
+                        {
+                          testResult = false;
+                                  strFileCompareTestResult = "BLOCKED"
+                                  err1 = issue
+                                  break
+                        }
+                        else
+                        {
                         // add instance 1 xpath and instance 2 xpath to listXpath
                           listXpathInstance.add(0,xpathInstance1)
                           listXpathInstance.add(1,xpathInstance2)
@@ -1249,7 +1379,14 @@ while(indexRunner < wsdlTestSteps.size())
 
                                   if(isIssueExistedInListIssue == false)
                                   {
-                                    listIssue.add(subject)
+                                  	 if (subject.contains("Expected text value") && isXpathExistedInListNode == true)
+                                  	 {
+                                  	 	break;
+                                  	 }
+                                  	 else
+                                  	 {
+                                  	 	listIssue.add(subject)
+                                  	 }
                                     int collumnIndexToWriteIssue2Instance = 2
                                     log.info("=======Start finding Cell index which doesn't have data yet=======")
                                     int IndexIssueExcel = 2
@@ -1278,76 +1415,35 @@ while(indexRunner < wsdlTestSteps.size())
                                                 }
                                               else
                                                 {
-                                                // Parse Xpath to Xml format
-                                                String locationXMLFileOf2InstanceFinal = locationXMLFileOf2Instance.get(w).replace('////', '//');
-                                                File inputFile = new File(locationXMLFileOf2Instance.get(w))
-                                                DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance()
-                                                dbFactory.setNamespaceAware(true)
-                                                DocumentBuilder dBuilder
-                                                dBuilder = dbFactory.newDocumentBuilder()
-                                                Document doc = dBuilder.parse(inputFile)
-                                                XPath xPath =  XPathFactory.newInstance().newXPath()
-                                                String expression = "/" + listXpathInstance.get(w)
-                                                //10-08 6:45 pm Improve write node - Hải
-                                                ///Envelope[1]/Body[1]/response[1]/artikelList[1]/artikel[1]/party[1]/address[1]/city[1]/text()[1]
-										                                                /* List<String> test = new ArrayList<String>();
-										        String xpath = "/artikelList[1]/artikel[1]/party[1]/address[1]/city[1]/text()[1]";
-										        String cutdown;
-										        int step = 0;
-										        int indexOfStringText = 0;
-										        for(int i = 0; i < xpath.length(); i++)
-										        {
-
-										            int stopCut = indexOfStringText + xpath.indexOf("]" , indexOfStringText) + 1;
-										            cutdown  = xpath.substring(indexOfStringText, stopCut);
-										            xpath  = xpath.substring(stopCut, xpath.length());
-										            test.add(cutdown);
-										            //indexOfStringText = stopCut;
-										            i = stopCut;
-										            System.out.println(" at step = " +  step + " list test  = " +  test);
-										            step++;
-										        }
-										        xpath ="";
-										        
-										        for (int m = 0; m < test.size() - 2; m++)
-										        {
-										            xpath = xpath + "/" + test.get(m);
-										        }
-										        System.out.println(" new xpath = " + xpath);
-                                                */
-                                                if (expression.contains("text()"))
-                                                  {
-                                                    expression = expression.substring(0, expression.indexOf("/text()"))
-                                                  }
-                                                log.info("xpath expression " + w + " " + expression)
-                                                NodeList nodeList = (NodeList) xPath.compile(expression.trim()).evaluate(doc, XPathConstants.NODESET);
-                                                Document newXmlDocument = DocumentBuilderFactory.newInstance()
-                                                        .newDocumentBuilder().newDocument();
-                                                Element root = newXmlDocument.createElement("root")
-                                                newXmlDocument.appendChild(root);
-                                                for (int i = 0; i < nodeList.getLength(); i++)
-                                                 {
-                                                    org.w3c.dom.Node node = nodeList.item(i);
-                                                    org.w3c.dom.Node copyNode = newXmlDocument.importNode(node, true)
-                                                    root.appendChild(copyNode)
-                                                 }
-                                                  // Write XML issue to Excel
-                                                 printXmlDocument(newXmlDocument,sheetIssues, cellFormat, IndexIssueExcel, collumnIndexToWriteIssue2Instance);
-                                                 collumnIndexToWriteIssue2Instance++
+                                                    // Parse Xpath to Xml format
+                                                    // String input file location, String xpath, int removeNode,
+                                                    // tuesday 08/14 refactor code
+                                                    String expression = "/" + listXpathInstance.get(w)
+                                                    String locationXMLFileOf2InstanceFinal = locationXMLFileOf2Instance.get(w).replace('////', '//')
+                                                    Document xpathToXml = parseXpathToXmlFormat(locationXMLFileOf2InstanceFinal, expression, 0)
+                                                      // Write XML issue to Excel
+                                                     printXmlDocument(xpathToXml,sheetIssues, cellFormat, IndexIssueExcel, collumnIndexToWriteIssue2Instance);
+                                                     collumnIndexToWriteIssue2Instance++
                                                 }
                                     }
                           }
-                  // ==========new==========release v2 1045 SPC - Refactor the SPC reporting=======
                         }
                     }
             }
+
   }
               // =================== END REFACTORING=======================
-                                            log.info("***** Check list issue data  ******")
+                            /*                log.info("***** Check list issue data  ******")
                               for(int indexListIssue = 0; indexListIssue < listIssue.size(); indexListIssue++ )
                                 {
                                   log.info("Data at index " + indexListIssue + " is " + listIssue.get(indexListIssue))
+                                }*/
+                                log.info("==== list xpath issue of different value cases ====")
+                                for (int indexXpathList = 0; indexXpathList < xpathIssueOfExpectedValue.size(); indexXpathList++)
+                                {
+                                  log.info(xpathIssueOfExpectedValue.get(indexXpathList))
                                 }
+
           }
 }
               else
@@ -1752,13 +1848,7 @@ sheetPerformance.addCell(perfTotalElapsedTimeValue);
              sheetIssues.addCell(cellResultNotesHai);
           }
 
-           def void printJavaXmlDocument(Document document) {
-           DOMImplementationLS domImplementationLS = (DOMImplementationLS) document
-               .getImplementation();
-           LSSerializer lsSerializer = domImplementationLS.createLSSerializer();
-           String string = lsSerializer.writeToString(document);
-           System.out.println(string)        ;
-         }
+
 
 // Write and close the file
 excelResult.write();
