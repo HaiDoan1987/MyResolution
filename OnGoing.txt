@@ -1,0 +1,96 @@
+	List<String> convertXpathToListNodes(String xpath)
+    {
+      	List<String> listNodes = new ArrayList<String>();
+        String cutdown;
+        int indexOfStringText = 0;
+        int stopCut = 0;
+        for(int indexExpression = 0; indexExpression < xpath.length(); indexExpression++)
+        {
+
+            if (xpath.indexOf("]" , indexOfStringText) == -1)
+            {
+                break;
+            }
+            stopCut = indexOfStringText + xpath.indexOf("]" , indexOfStringText) + 1;
+            cutdown  = xpath.substring(indexOfStringText, stopCut);
+            xpath  = xpath.substring(stopCut, xpath.length());
+            listNodes.add(cutdown);
+            //indexOfStringText = stopCut
+            indexExpression = stopCut;
+        }
+        return listNodes;
+    }
+	// check data existed in list or not
+         boolean isNewDataExistedInList(List<String> listdata, String dataNeedToBeVerified, Boolean stringOnly )
+      {
+        //log.info("start to check listdata with new data " +  dataNeedToBeVerified)
+        boolean isExisted = false;
+        String onlyWordString = dataNeedToBeVerified
+        if (stringOnly == true) 
+        	{
+        	  onlyWordString =  onlyWordString.replaceAll("[^a-zA-Z]+", "")
+        	}
+        
+        for (int i = 0; i < listdata.size(); i++)
+          {
+          	
+          	//log.info("Start to compare " + onlyWordString + " with data in list at index  " + i + " with is " + listdata.get(i))
+            if (listdata.get(i).equals(onlyWordString))
+            {
+               // log.info(" new data  " + onlyWordString + " already existed in list at list index " + i)
+                isExisted = true;
+                break;
+            }
+          }
+          return isExisted
+      }
+//=============================================================
+        	//DorXML.ExtractXmlBlockToAnotherXMl("D:\\projects\\td-web-testing\\temporarely_Second_XML_Response_tr_searchPersonRequest_tr_searchPersonByName.xml", "//requestedParty[1]", "D:\\projects\\td-web-testing\\test11.xml") 
+		List<String> xpath = DorXML.getListXpathFromXMlFile("D:\\projects\\td-web-testing\\temporarely_Second_XML_Response_tr_searchPersonRequest_tr_searchPersonByName.xml");
+		List<String> ignoreNodes = ["partyList"]
+		List<String> parentNodes = []
+		List<String> childNodes = []
+		List<String> data = []
+		String tempNode = ""
+		for (int i  = 0; i < xpath.size(); i++)
+		{
+				List<String> tempXpath = [];
+				String child = ""
+				int indexParentNode = 1;
+				int indexChildNote = 2;
+				String tempXpathBeforeCut = xpath.get(i)
+				// tempxpath start from ArtikelList
+				tempXpath = convertXpathToListNodes(tempXpathBeforeCut.substring(tempXpathBeforeCut.indexOf("/artikelList")))
+				// short xpath to //artikelList
+				if (parentNodes.size() == 0)
+					{
+						// index 4 = Level 1 node
+						parentNodes.add(tempXpath.get(indexParentNode))
+					}
+				else
+					{
+						if (!parentNodes.contains(tempXpath.get(indexParentNode)))
+						{
+							parentNodes.add(tempXpath.get(indexParentNode))		
+						}
+					}
+
+				if (isNewDataExistedInList(ignoreNodes, tempXpath.get(indexChildNote), true))
+					{
+	
+						indexChildNote = indexChildNote +  1
+					}
+				child = tempXpath.get(indexChildNote) + tempXpath.get(indexChildNote +1 )
+
+				if (childNodes.size() == 0)
+					{
+						childNodes.add(child)	
+					}
+				else if (isNewDataExistedInList(childNodes, child, false) == false)
+					{						
+						childNodes.add(child)					
+					}
+		}			
+		log.info(parentNodes)
+		log.info(childNodes)
+        	

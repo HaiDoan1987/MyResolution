@@ -1,0 +1,1832 @@
+// Import necessary lib - Please make sure your root lib folder has stored the libraries root\soapui-5.0.0\bin\ext
+import groovy.xml.XmlUtil
+import org.custommonkey.xmlunit.*
+import java.io.File;
+import java.util.Date;
+import jxl.*;
+import jxl.write.*;
+import com.eviware.soapui.model.testsuite.Assertable;
+import com.eviware.soapui.support.GroovyUtils;
+import com.eviware.soapui.impl.wsdl.WsdlProject
+import javax.xml.namespace.QName
+import com.eviware.soapui.impl.wsdl.*;
+import groovy.swing.SwingBuilder
+import com.eviware.soapui.support.UISupport
+import org.custommonkey.xmlunit.ElementQualifier
+import org.codehaus.groovy.runtime.InvokerHelper
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.custommonkey.xmlunit.DetailedDiff;
+import org.custommonkey.xmlunit.Diff;
+import org.custommonkey.xmlunit.Difference;
+import org.custommonkey.xmlunit.ElementNameQualifier;
+import org.custommonkey.xmlunit.MatchTracker;
+import org.custommonkey.xmlunit.NodeDetail;
+import org.xml.sax.SAXException;
+
+import javax.xml.xpath.*;
+import java.io.File;
+import javax.xml.parsers.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import java.io.IOException;
+import java.io.StringWriter;
+
+import org.xml.sax.SAXException;
+
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+//import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSSerializer;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import java.lang.Object
+import org.custommonkey.xmlunit.Difference
+//import org.custommonkey.xmlunit
+
+
+import groovy.xml.XmlUtil
+import org.custommonkey.xmlunit.*
+
+
+
+//Update Definition
+
+myInterface=(WsdlInterface) testRunner.testCase.testSuite.project.getInterfaceByName("BusinessInformationServiceSoapBinding");
+
+myInterface.updateDefinition("D:/projects/td-online/web/WEB-INF/config/wsdl/bis/V${com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.version")}/BusinessInformationService.wsdl", false);
+
+//Create the temporary directory
+def folderTemporaryXMLFileFirstInstance = new File(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_temporaryXMLFile_FirstInstance")
+def folderTemporaryXMLFileSecondInstance = new File(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_temporaryXMLFile_SecondInstance")
+def folderTestResult = new File(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_testResults")
+if( !folderTemporaryXMLFileFirstInstance.exists() )
+{
+  folderTemporaryXMLFileFirstInstance.mkdirs()
+}
+if( !folderTemporaryXMLFileSecondInstance.exists() )
+{
+  folderTemporaryXMLFileSecondInstance.mkdirs()
+}
+if( !folderTestResult.exists() )
+{
+  folderTestResult.mkdirs()
+}
+
+// ========================== Method ========================
+
+//=====================================
+
+
+// Declare variables
+def groovyUtils = new com.eviware.soapui.support.GroovyUtils( context )
+def holder, p, p1, result, xmlDiff
+int indexRunner = 0
+def projectPath = groovyUtils.projectPath;
+def testCase = testRunner.testCase;
+text = "~"
+star = "*";
+int indexExcel = 24
+int indexWriteResult = 1
+String temporaryNoteFirstInstance = "";
+List personIDs = [];
+
+String strFirstInstance = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.endPointURLInstance1");
+String strSecondInstance = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.endPointURLInstance2");
+def intLimitOfDifferentPercentage = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("differencePercentageToHighlight")
+String strInstance1ArticleRequestID = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.instance1ArticleRequestID").trim();
+String strInstance2ArticleRequestID = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.instance2ArticleRequestID").trim();
+
+// Get ignored attributes and set into global property
+String strIgnoreAttributes = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("listIgnoreAttribute");
+def lstIgnoreAttributes = strIgnoreAttributes.split(',');
+// Get the ignored nodes and set into global property
+String strIgnoreNode = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("listIgnoreSpecificNode")
+def lstIgnoreNode = strIgnoreNode.split(',');
+
+//Read the Excel file then get data from row 0, column 0 and the first sheet, and declare in a variable
+WorkbookSettings settings = new WorkbookSettings();
+settings.encoding = "Cp1252"
+settings.locale = new Locale("pt", "BR")
+Workbook workbook = Workbook.getWorkbook(new File(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.input.path")),settings)
+Sheet sheet = workbook.getSheet(0)
+rowCount = sheet.getRows();
+rowCount = rowCount-1
+
+// Create new copy of the data file because jxl does not support to edit directly in the original file.
+String filePath = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_testResults//" + "Test_Result_$testCase.name" + ".xls"
+f = new File(filePath)
+f.delete()
+
+WritableWorkbook excelResult = Workbook.createWorkbook(new File(filePath), workbook);
+WritableSheet sheetResult = excelResult.getSheet(0);
+sheetResult.setName("Detailed")
+WritableSheet sheetSummary = excelResult.createSheet("Summary", 1);
+WritableSheet sheetPerformance = excelResult.createSheet("Performance", 2);
+WritableSheet sheetReference = excelResult.copySheet(0, "Reference", 4);
+sheetReference = excelResult.getSheet(3);
+
+//Format the Result and Summary sheet style
+WritableCellFormat cellFormat = new WritableCellFormat();
+cellFormat.setWrap(true);
+cellFormat.setAlignment(jxl.format.Alignment.LEFT);
+cellFormat.setVerticalAlignment(jxl.format.VerticalAlignment.CENTRE);
+cellFormat.setBorder(jxl.format.Border.ALL, jxl.format.BorderLineStyle.THIN, jxl.format.Colour.BLACK);
+
+WritableFont cellFont = new WritableFont(WritableFont.COURIER, 16);
+cellFont.setBoldStyle(WritableFont.BOLD);
+WritableCellFormat cellFormatBold = new WritableCellFormat(cellFont);
+
+WritableCellFormat cellFormatHighlight = new WritableCellFormat();
+cellFormatHighlight.setWrap(true);
+cellFormatHighlight.setAlignment(jxl.format.Alignment.LEFT);
+cellFormatHighlight.setVerticalAlignment(jxl.format.VerticalAlignment.CENTRE);
+cellFormatHighlight.setBorder(jxl.format.Border.ALL, jxl.format.BorderLineStyle.THIN, jxl.format.Colour.BLACK);
+def strbackgroundHighlightColor = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("backgroundHighlightColor")
+if(strbackgroundHighlightColor == "")
+{
+  strbackgroundHighlightColor = "WHITE"
+}
+cellFormatHighlight.setBackground(Colour."$strbackgroundHighlightColor");
+
+CellView cell = sheetSummary.getColumnView(0);
+cell.setSize(10000);
+sheetSummary.setColumnView(0, cell);
+sheetPerformance.setColumnView(0, cell);
+cell.setSize(10000);
+sheetSummary.setColumnView(1, cell);
+sheetPerformance.setColumnView(1, cell);
+sheetResult.setColumnView(1, cell);
+sheetReference.setColumnView(1, cell);
+
+cell.setSize(5000);
+sheetSummary.setColumnView(2, cell);
+cell.setSize(10000);
+sheetPerformance.setColumnView(2, cell);
+cell.setSize(5000);
+sheetSummary.setColumnView(3, cell);
+cell.setSize(10000);
+sheetPerformance.setColumnView(3, cell);
+cell.setSize(5000);
+sheetSummary.setColumnView(4, cell);
+cell.setSize(35000);
+sheetSummary.setColumnView(5, cell);
+
+//Write Summary information
+
+Label summaryTestResult = new Label(0, 0, "Swiss Platform Consolidation - Summary Test Result", cellFormatBold);
+Label summaryTestCase = new Label(0, 1, "Test Case", cellFormat);
+Label summaryTestCaseValue = new Label(1, 1, "$testCase.name", cellFormat);
+Label summaryStartTime = new Label(0, 2, "Start time", cellFormat);
+Label summaryStartTimeValue = null;
+Label summaryEndTime = new Label(0, 3, "End time", cellFormat);
+Label summaryEndTimeValue = new Label(1, 3, "This is empty because your test is terminated", cellFormat);
+Label summaryTotalElapsedTime = new Label(0, 4, "Total elapsed time", cellFormat);
+Label summaryTotalElapsedTimeValue = new Label(1, 4, "This is empty because your test is terminated", cellFormat);
+Label summaryTestStep = new Label(0, 8, "Test Steps", cellFormat);
+Label summaryTestSteps = null;
+Label summaryNoOfTested = new Label(1, 8, "Number of tested company", cellFormat);
+Label summaryNoOfTestedValue = null;
+Label summaryNoOfPasses = new Label(2, 8, "Number of Passes", cellFormat);
+Label summaryNoOfFailes = new Label(3, 8, "Number of Fails", cellFormat);
+Label summaryNoOfBlocks = new Label(4, 8, "Number of Blocks", cellFormat);
+Label summaryNotes = new Label(5, 8, "Notes", cellFormat);
+
+Label summaryNoOfPassValue = null;
+Label summaryNoOfFailValue = null;
+Label summaryNoOfBlockValue = null;
+Label summaryNoteValue = null;
+
+//Write Performance information
+Label perfTestResult = new Label(0, 0, "Swiss Platform Consolidation - Performance Test Statistic", cellFormatBold);
+Label perfTestCase = new Label(0, 1, "Test Case", cellFormat);
+Label perfTestCaseValue = new Label(1, 1, "$testCase.name", cellFormat);
+Label perfStartTime = new Label(0, 2, "Start time", cellFormat);
+Label perfStartTimeValue = null;
+Label perfEndTime = new Label(0, 3, "End time", cellFormat);
+Label perfEndTimeValue = new Label(1, 3, "This is empty because your test is terminated", cellFormat);
+Label perfTotalElapsedTime = new Label(0, 4, "Total elapsed time", cellFormat);
+Label perfTotalElapsedTimeValue = new Label(1, 4, "This is empty because your test is terminated", cellFormat);
+Label perfTestStep = new Label(0, 8, "Test Steps", cellFormat);
+Label perfTestSteps = null;
+Label perfTotalElapsedTime1st = null;
+Label perfTotalElapsedTime2nd = null;
+Label perfTestStepsDetails = null;
+Label perfNoOfTested = new Label(1, 8, "Number of tested company", cellFormat);
+Label perfNoOfTestedValue = null;
+Label perfTotalTime1st = new Label(2, 8, "Total time of the first instance " + strFirstInstance, cellFormat);
+Label perfTotalTime2nd = new Label(3, 8, "Total time of the second instance " + strSecondInstance , cellFormat);
+Label perfDataNameValue = null;
+Label perfElapsedTimeDetails = null;
+Label perfLegendHighlight = null
+
+
+
+if(intLimitOfDifferentPercentage == "")
+{
+  intLimitOfDifferentPercentage = 0
+  perfLegendHighlight = new Label(5, 0, "", cellFormat);
+}
+else
+{
+  intLimitOfDifferentPercentage = intLimitOfDifferentPercentage.toInteger()
+  perfLegendHighlight = new Label(5, 0, "The difference percentage is greater than " + intLimitOfDifferentPercentage + " %", cellFormatHighlight);
+}
+
+log.info " ${star*400}";
+log.info " ${text*3} Start testing for test Case: $testCase.name"
+
+if(strbackgroundHighlightColor == "WHITE")
+{
+  perfLegendHighlight = new Label(5, 0, "");
+}
+
+// Write some Performance labels
+sheetPerformance.addCell(perfTestResult);
+sheetPerformance.addCell(perfTestCase);
+sheetPerformance.addCell(perfStartTime);
+sheetPerformance.addCell(perfEndTime);
+sheetPerformance.addCell(perfTotalElapsedTime);
+sheetPerformance.addCell(perfTestStep);
+sheetPerformance.addCell(perfNoOfTested);
+sheetPerformance.addCell(perfTotalTime1st);
+sheetPerformance.addCell(perfTotalTime2nd);
+sheetPerformance.addCell(perfLegendHighlight);
+sheetPerformance.addCell(perfTestCaseValue);
+sheetPerformance.addCell(perfEndTimeValue);
+sheetPerformance.addCell(perfTotalElapsedTimeValue);
+
+
+// Write some Summary labels
+sheetSummary.addCell(summaryTestResult);
+sheetSummary.addCell(summaryTestCase);
+sheetSummary.addCell(summaryStartTime);
+sheetSummary.addCell(summaryEndTime);
+sheetSummary.addCell(summaryTotalElapsedTime);
+sheetSummary.addCell(summaryTestCaseValue);
+sheetSummary.addCell(summaryEndTimeValue);
+sheetSummary.addCell(summaryTotalElapsedTimeValue);
+
+// declare methods
+		// remove non character and non number
+	  String removeUnwantedCharacters( String xpathNeedToBeConverted)
+  {
+		  log.info("start remove unWantedCharacter for String " + xpathNeedToBeConverted)
+            String cutdown;
+            int step = 0;
+            int indexOfStringText = 0;
+            int stopCut = 0;
+            String newXpath = ""
+            for(int indexExpression = 0; indexExpression < xpathNeedToBeConverted.length(); indexExpression++)
+            {
+
+                stopCut = indexOfStringText + xpathNeedToBeConverted.indexOf("]" , indexOfStringText) + 1;
+                cutdown  = xpathNeedToBeConverted.substring(indexOfStringText, stopCut);
+                xpathNeedToBeConverted  = xpathNeedToBeConverted.substring(stopCut, xpathNeedToBeConverted.length());
+                if ((cutdown.contains("artikel[")))
+                {
+				          cutdown = cutdown.replaceAll("[^0-9a-zA-Z]+", "")
+                }
+                else
+                {
+                	cutdown = cutdown.replaceAll("[^a-zA-Z]+", "")
+                }
+                if (cutdown.contains("text"))
+                {
+                	break;
+                }
+                log.info("cut down is " + cutdown)
+                indexExpression = stopCut;
+                newXpath = newXpath + "/" + cutdown ;
+            }
+            log.info("new xpath after removing unwanted characters " + newXpath)
+            return newXpath
+  }
+  //Convert xpath to a list string node
+  List<String> convertXpathToListNodes(String xpath)
+    {
+      List<String> listNodes = new ArrayList<String>();
+      String cutdown;
+      int indexOfStringText = 0;
+      int stopCut = 0;
+      for(int indexExpression = 0; indexExpression < xpath.length(); indexExpression++)
+      {
+
+          stopCut = indexOfStringText + xpath.indexOf("]" , indexOfStringText) + 1;
+          cutdown  = xpath.substring(indexOfStringText, stopCut);
+          xpath  = xpath.substring(stopCut, xpath.length());
+          listNodes.add(cutdown);
+          //indexOfStringText = stopCut
+          indexExpression = stopCut;
+      }
+      return listNodes;
+    }
+
+    // convert xpath to document Xml format
+    Document parseXpathToXmlFormat(String fileLocation, String Xpath, int removeNodes)
+    {
+      List<String> listNodes = convertXpathToListNodes(Xpath)
+      File inputFile = new File(fileLocation)
+      DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance()
+      dbFactory.setNamespaceAware(true)
+      DocumentBuilder dBuilder
+      dBuilder = dbFactory.newDocumentBuilder()
+      Document doc = dBuilder.parse(inputFile)
+      XPath xPath =  XPathFactory.newInstance().newXPath()
+      log.info("list node is " + listNodes)
+      Xpath ="";
+      int indexParentNode = listNodes.size() - removeNodes
+      for (int m = 0; m < listNodes.size() - removeNodes ; m++)
+      {
+          Xpath = Xpath + listNodes.get(m);
+      }
+      log.info("xpath expression " + Xpath)
+      NodeList nodeList = (NodeList) xPath.compile(Xpath.trim()).evaluate(doc, XPathConstants.NODESET);
+      Document newXmlDocument = DocumentBuilderFactory.newInstance()
+              .newDocumentBuilder().newDocument();
+      String rootName = listNodes.get(indexParentNode -2).replaceAll("[^a-zA-Z]+", "")
+      Element root = newXmlDocument.createElement(rootName)
+      newXmlDocument.appendChild(root);
+      for (int i = 0; i < nodeList.getLength(); i++)
+       {
+          org.w3c.dom.Node node = nodeList.item(i);
+          org.w3c.dom.Node copyNode = newXmlDocument.importNode(node, true)
+          root.appendChild(copyNode)
+       }
+       return newXmlDocument
+    }
+
+    // find the which row contain data or not base on boolean isHasData
+    int locateIndexCellStatus(boolean isEmpty, int indexExcelStartToScan, WritableSheet sheet)
+      {
+        int IndexIsueExcel = indexExcelStartToScan
+        while (sheet.getCell(0,IndexIsueExcel).getContents().toString().equals("") == isEmpty)
+          {
+
+                 IndexIsueExcel = IndexIsueExcel + 1
+          }
+          return IndexIsueExcel
+      }
+    // isNewDataExistedInList
+    boolean isNewIndexExistedInList(List<Integer> listdata, int newIndex )
+      {
+        boolean isExisted = false;
+        for (int i = 0; i < listdata.size(); i++)
+          {
+            if (listdata.get(i) == newIndex)
+            {
+                log.info(" new data index " + newIndex + " already existed in list at list index " + i)
+                isExisted = true;
+                break;
+            }
+          }
+          return isExisted
+      }
+      // is new String existed in list
+     boolean isNewDataExistedInList(List<String> listdata, String dataNeedToBeVerified )
+      {
+        boolean isExisted = false;
+        for (int i = 0; i < listdata.size(); i++)
+          {
+            if (listdata.get(i).equals(dataNeedToBeVerified))
+            {
+                log.info(" new data  " + dataNeedToBeVerified + " already existed in list at list index " + i)
+                isExisted = true;
+                break;
+            }
+          }
+          return isExisted
+      }
+
+      // Method create summaryTableLabel
+
+         def createSummaryTableLabel(int startExcelIndex, WritableSheet sheet, String nameArticle, WritableCellFormat cellFormat)
+       {
+            int startCollumn = 0;
+            int startRow = startExcelIndex
+            //label (collumn, row, labelName, cellFormat) 
+            Label cellArticleName = new Label (startCollumn, startRow, nameArticle, cellFormat)
+           
+            Label cellTestData = new Label (startCollumn + 1, startRow, "Number of tested person", cellFormat)
+
+            Label cellNotIdentical = new Label (startCollumn + 2, startRow, "NotIdentical", cellFormat)
+
+            Label cellSimilarButNotIdentical = new Label (startCollumn + 3, startRow, "Similar But Not Identical", cellFormat)
+
+            Label cellIdentical = new Label (startCollumn + 4, startRow, "Identical", cellFormat) 
+
+            Label cellPercentIdentical = new Label (startCollumn + 4, startRow, "%Identical", cellFormat) 
+
+            sheet.addCell(cellArticleName);
+            sheet.addCell(cellTestData);
+            sheet.addCell(cellNotIdentical);
+            sheet.addCell(cellSimilarButNotIdentical);
+            sheet.addCell(cellIdentical);
+            sheet.addCell(cellPercentIdentical);
+        }
+//=================================
+
+
+// Get all test steps
+wsdlTestSteps = testRunner.testCase.getTestStepsOfType( com.eviware.soapui.impl.wsdl.teststeps.WsdlTestRequestStep.class);
+
+wsdlTestSteps.removeAll{it.isDisabled() == true}
+
+Label headerResult = null
+Label headerResultNotes = null
+Label cellResult = null
+Label cellResultNotes = null
+Label cellResultNotesHai = null
+int indexRowReportSummaryOfTestStep = 9
+String errCompare = null;
+
+int temporaryIntForMap = 0
+Map mapResult = [:]
+
+// Initialize the map
+while(temporaryIntForMap < wsdlTestSteps.size())
+{
+    // Get current test step Name
+    testStepName = wsdlTestSteps.get(temporaryIntForMap).name
+    // the listTestResult [ int pass, int fail, int block, string notes, long elapsedTimeFirstInstance, long elapsedTimeSecondInstance]
+    List listTestResult = [0,0,0,"",0,0]
+    mapResult.put( "$testStepName", listTestResult)
+    temporaryIntForMap = temporaryIntForMap + 1
+}
+
+// Trace the start time
+Date start = new Date()
+String startTimeOutput = start.format("yyyy-MM-dd HH:mm:ss")
+summaryStartTimeValue = new Label(1, 2, startTimeOutput, cellFormat);
+perfStartTimeValue = new Label(1, 2, startTimeOutput, cellFormat);
+long l1 = start.getTime();
+
+sheetSummary.addCell(summaryStartTimeValue);
+sheetPerformance.addCell(perfStartTimeValue);
+
+//freeze the first column
+sheetResult.getSettings().setVerticalFreeze(1);
+sheetReference.getSettings().setVerticalFreeze(1);
+
+sheetResult.getSettings().setHorizontalFreeze(2);
+sheetResult.getSettings().setHorizontalFreeze(2);
+
+excelResult.write();
+excelResult.close();
+
+//Backup test result file
+Workbook workbookBackup = Workbook.getWorkbook(new File(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_testResults//" + "Test_Result_$testCase.name" + ".xls"),settings)
+String filePathBackup = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_testResults//" + "Backup_Test_Result_$testCase.name" + ".xls"
+f = new File(filePathBackup)
+WritableWorkbook excelResultBackup = Workbook.createWorkbook(new File(filePathBackup), workbookBackup);
+excelResultBackup.write()
+excelResultBackup.close()
+
+/*
+ *  Declare excel file to store person data test
+ */
+String flagRetrievedPerson = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.retrived.person.flag");
+WritableWorkbook workbookTestDataPerson = null;
+WritableSheet sheetTestDataPerson = null;
+String strCompanyArticlesRetrievePerson = null;
+def listCompanyArticlesRetrievePerson = null;
+int indexExelOutputTestDataPerson = 1;
+// Write the cell values
+Label cellIDTestDataPerson = null;
+Label cellLastNameTestDataPerson = null;
+Label cellFirstNameTestDataPerson = null;
+Label cellStreetTestDataPerson = null;
+Label cellHouseNumberTestDataPerson = null;
+Label cellCityTestDataPerson = null;
+Label cellZipCodeTestDataPerson = null;
+Label cellCountryTestDataPerson = null;
+Label cellTDNoTestDataPerson = null;
+Label cellCRIFIDCoreDBTestDataPerson = null;
+
+
+if (flagRetrievedPerson == "true")
+{
+  workbookTestDataPerson = Workbook.createWorkbook(new File(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.path.person")), settings);
+  sheetTestDataPerson = workbookTestDataPerson.createSheet("SheetTest", 0);
+  // Write the headers
+  Label cellIDHeaderTestDataPerson = new Label(0, 0, "OFWI_ID");
+  Label cellLastNameHeaderTestDataPerson = new Label(1, 0, "PERSON_FIRSTNAME");
+  Label cellFirstNameHeaderTestDataPerson = new Label(2, 0, "PERSON_LASTNAME");
+  Label cellStreetHeaderTestDataPerson = new Label(3, 0, "PERSON_STREET");
+  Label cellHouseNumberHeaderTestDataPerson = new Label(4, 0, "HOUSE_NUMBER");
+  Label cellCityHeaderTestDataPerson = new Label(5, 0, "CITY");
+  Label cellZipCodeHeaderTestDataPerson = new Label(6, 0, "ZIPCODE");
+  Label cellCountryHeaderTestDataPerson = new Label(7, 0, "COUNTRY");
+  Label cellTDKeyHeaderTestDataPerson = new Label(8, 0, "TD_KEY");
+  Label cellCRIFIDCoreDBHeaderTestDataPerson = new Label(9, 0, "CRIFID_COREDB");
+
+  sheetTestDataPerson.addCell(cellIDHeaderTestDataPerson);
+  sheetTestDataPerson.addCell(cellFirstNameHeaderTestDataPerson);
+  sheetTestDataPerson.addCell(cellLastNameHeaderTestDataPerson);
+  sheetTestDataPerson.addCell(cellStreetHeaderTestDataPerson);
+  sheetTestDataPerson.addCell(cellHouseNumberHeaderTestDataPerson);
+  sheetTestDataPerson.addCell(cellCityHeaderTestDataPerson);
+  sheetTestDataPerson.addCell(cellZipCodeHeaderTestDataPerson);
+  sheetTestDataPerson.addCell(cellCountryHeaderTestDataPerson);
+  sheetTestDataPerson.addCell(cellTDKeyHeaderTestDataPerson);
+  sheetTestDataPerson.addCell(cellCRIFIDCoreDBHeaderTestDataPerson);
+}
+List listNameSteps = [];
+
+Cell[] columnTitle = sheet.getRow(0);
+int numberOfColumns = columnTitle.size();
+int indexHeaderResult = columnTitle.size();
+
+String[] lstInstanceRequestID = ["OFWI_ID", "TD_KEY", "CRIFID_COREDB"];
+boolean flagOFWIID = false;
+boolean flagTDKEY = false;
+boolean flagCRIFIDCOREDB = false;
+int companyOFWIIDColumn = 0;
+int companyNameColumn = 0;
+int companyTDKeyColumn = 0;
+int companyCRIFIDCoreDBColumn = 0;
+String strFirstResponse;
+String strSecondResponse;
+
+for (int k = 0; k < columnTitle.size(); k++)
+{
+  if (columnTitle[k].getContents().equals("OFWI_ID"))
+  {
+    companyOFWIIDColumn = columnTitle[k].getColumn();
+    flagOFWIID = true;
+  }
+  if (columnTitle[k].getContents().equals("COMPANY_NAME"))
+  {
+    companyNameColumn = columnTitle[k].getColumn();
+  }
+  if (columnTitle[k].getContents().equals("TD_KEY"))
+  {
+    companyTDKeyColumn = columnTitle[k].getColumn();
+    flagTDKEY = true;
+  }
+  if (columnTitle[k].getContents().equals("CRIFID_COREDB"))
+  {
+    companyCRIFIDCoreDBColumn = columnTitle[k].getColumn();
+    flagCRIFIDCOREDB = true;
+  }
+}
+
+def alert = com.eviware.soapui.support.UISupport;
+
+if (flagTDKEY == false)
+{
+  if (strInstance1ArticleRequestID == "TD_KEY" && strInstance2ArticleRequestID == "TD_KEY")
+  {
+    alert.showErrorMessage("Both instances use TD_KEY but the Excel file is missing TD_KEY column. Please check again!")
+    testRunner.cancel("Missing TD_KEY column in Excel file")
+    return null
+  }
+  else if (strInstance1ArticleRequestID == "TD_KEY" && strInstance2ArticleRequestID != "TD_KEY")
+  {
+    alert.showErrorMessage("Instance 1 uses TD_KEY but the Excel file is missing TD_KEY column. Please check again!")
+    testRunner.cancel("Missing TD_KEY column in Excel file")
+    return null
+  }
+  else if (strInstance1ArticleRequestID != "TD_KEY" && strInstance2ArticleRequestID == "TD_KEY")
+  {
+    alert.showErrorMessage("Instance 2 uses TD_KEY but the Excel file is missing TD_KEY column. Please check again!")
+    testRunner.cancel("Missing TD_KEY column in Excel file")
+    return null
+  }
+}
+
+if (flagCRIFIDCOREDB == false)
+{
+  if (strInstance1ArticleRequestID == "CRIFID_COREDB" && strInstance2ArticleRequestID == "CRIFID_COREDB")
+  {
+    alert.showErrorMessage("Both instances use CRIFID_COREDB but the Excel file is missing CRIFID_COREDB column. Please check again!")
+    testRunner.cancel("Missing CRIFID_COREDB column in Excel file")
+    return null
+  }
+  else if (strInstance1ArticleRequestID == "CRIFID_COREDB" && strInstance2ArticleRequestID != "CRIFID_COREDB")
+  {
+    alert.showErrorMessage("Instance 1 uses CRIFID_COREDB but the Excel file is missing CRIFID_COREDB column. Please check again!")
+    testRunner.cancel("Missing CRIFID_COREDB column in Excel file")
+    return null
+  }
+  else if (strInstance1ArticleRequestID != "CRIFID_COREDB" && strInstance2ArticleRequestID == "CRIFID_COREDB")
+  {
+    alert.showErrorMessage("Instance 2 uses CRIFID_COREDB but the Excel file is missing CRIFID_COREDB column. Please check again!")
+    testRunner.cancel("Missing CRIFID_COREDB column in Excel file")
+    return null
+  }
+}
+
+if (flagOFWIID == false)
+{
+  if (strInstance1ArticleRequestID == "OFWI_ID" && strInstance2ArticleRequestID == "OFWI_ID")
+  {
+    alert.showErrorMessage("Both instances use OFWI_ID but the Excel file is missing OFWI_ID column. Please check again!")
+    testRunner.cancel("Missing OFWI_ID column in Excel file")
+    return null
+  }
+  else if (strInstance1ArticleRequestID == "OFWI_ID" && strInstance2ArticleRequestID != "OFWI_ID")
+  {
+    alert.showErrorMessage("Instance 1 uses OFWI_ID but the Excel file is missing OFWI_ID column. Please check again!")
+    testRunner.cancel("Missing OFWI_ID column in Excel file")
+    return null
+  }
+  else if (strInstance1ArticleRequestID != "OFWI_ID" && strInstance2ArticleRequestID == "OFWI_ID")
+  {
+    alert.showErrorMessage("Instance 2 uses OFWI_ID but the Excel file is missing OFWI_ID column. Please check again!")
+    testRunner.cancel("Missing OFWI_ID column in Excel file")
+    return null
+  }
+}
+
+if (Arrays.asList(lstInstanceRequestID).contains(strInstance1ArticleRequestID) == false || Arrays.asList(lstInstanceRequestID).contains(strInstance2ArticleRequestID) == false)
+{
+  alert.showErrorMessage("Invalid property name in instances. Please input OFWI_ID, TD_KEY or CRIFID_COREDB for instances!")
+  testRunner.cancel("Invalid property name in instances")
+  return null
+}
+
+List xpathIssueOfExpectedValue = new ArrayList<String>();
+List nodesOfIssueXpath = new ArrayList<String>();
+
+int indexNextEntiryInPerformance = 1;
+
+indexExcel = 24
+while (indexExcel <= 24)
+{
+  workbook = Workbook.getWorkbook(new File(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_testResults//" + "Test_Result_$testCase.name" + ".xls"),settings)
+  filePath = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_testResults//" + "Test_Result_$testCase.name" + ".xls"
+  f = new File(filePath)
+
+  excelResult = Workbook.createWorkbook(new File(filePath), workbook);
+  sheetResult = excelResult.getSheet(0);
+  sheetSummary = excelResult.getSheet(1);
+  sheetPerformance = excelResult.getSheet(2);
+  sheetReference = excelResult.getSheet(3);
+
+// Set property for Company OFWI-ID
+Cell companyOFWIIDExcel = sheet.getCell(companyOFWIIDColumn,indexExcel) // getCell(column,row)
+String companyOFWIID = companyOFWIIDExcel.getContents().toString();
+
+// Set property for Company TDNo
+Cell companyTDKeyExcel = sheet.getCell(companyTDKeyColumn,indexExcel) // getCell(column,row)
+String companyTDKey = companyTDKeyExcel.getContents().toString();
+
+// Set property for Company CRIF ID CoreDB
+Cell companyCRIFIDCoreDBExcel = sheet.getCell(companyCRIFIDCoreDBColumn,indexExcel) // getCell(column,row)
+String companyCRIFIDCoreDB = companyCRIFIDCoreDBExcel.getContents().toString();
+
+// Set property for Company Name
+Cell companyNameExcel = sheet.getCell(companyNameColumn,indexExcel) // getCell(column,row)
+String companyName = companyNameExcel.getContents().toString();
+// Handle for ampersand in XML decode because of some company's name
+companyName = companyName.replace("&" , "&amp;")
+companyName = companyName.replace("<" , "&lt;")
+companyName = companyName.replace(">" , "&gt;")
+com.eviware.soapui.SoapUI.globalProperties.setPropertyValue("companyName", companyName)
+
+int temporaryIndex = indexRowReportSummaryOfTestStep + 3 + indexNextEntiryInPerformance + wsdlTestSteps.size()
+
+int companyIDI1Column = 0
+int companyIDI2Column = 0
+for (int l = 0; l < columnTitle.size(); l++)
+{
+  if (columnTitle[l].getContents().equals(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.instance1ArticleRequestID")))
+  {
+    companyIDI1Column = columnTitle[l].getColumn();
+  }
+  if (columnTitle[l].getContents().equals(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.instance2ArticleRequestID")))
+  {
+    companyIDI2Column = columnTitle[l].getColumn();
+  }
+}
+
+Cell companyIDI1Excel = sheet.getCell(companyIDI1Column,indexExcel) // getCell(column,row)
+String companyIDI1 = companyIDI1Excel.getContents().toString();
+Cell companyIDI2Excel = sheet.getCell(companyIDI2Column,indexExcel) // getCell(column,row)
+String companyIDI2 = companyIDI2Excel.getContents().toString();
+String perfDataIDValue = companyIDI1 + "\n-------------------------\n" + companyIDI2
+finalperfDataIDValue = new Label(0, temporaryIndex , perfDataIDValue, cellFormat);
+perfDataNameValue = new Label(1, temporaryIndex, companyName, cellFormat);
+sheetPerformance.addCell(finalperfDataIDValue);
+sheetPerformance.addCell(perfDataNameValue);
+
+int temporaryIntForPerformanceTestStepDetails = 2
+//TODO 1 refactor start all test case
+while(indexRunner < wsdlTestSteps.size())
+{
+    // Get current test step Name
+    testStep = wsdlTestSteps.get(indexRunner);
+    testStepName = testStep.name;
+  if (!listNameSteps.contains(testStepName))
+  {
+    listNameSteps.add(testStepName);
+  }
+    headerResult = new Label(indexHeaderResult, 0, "$testStepName" + " RESULT");
+    headerResultNotes = new Label(indexHeaderResult + 1, 0, "$testStepName" + " NOTES");
+    sheetResult.addCell(headerResult);
+    sheetResult.addCell(headerResultNotes);
+
+    headerResultFirstResponse = new Label(indexHeaderResult, 0, "$testStepName" + " FIRST RESPONSE");
+    headerResultSecondResponse = new Label(indexHeaderResult + 1, 0, "$testStepName" + " SECOND RESPONSE");
+    sheetReference.addCell(headerResultFirstResponse);
+    sheetReference.addCell(headerResultSecondResponse);
+
+    // Set EndpointURL() for the first instance
+    testRunner.testCase.getTestStepByName("$testStepName").getHttpRequest().setEndpoint(strFirstInstance);
+    //-----Set Username/Password for instance 1--------
+
+    testRunner.testCase.getTestStepByName("$testStepName").httpRequest.setUsername(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.auth." + "$testStepName" + ".inst1.username"))
+    testRunner.testCase.getTestStepByName("$testStepName").httpRequest.setPassword(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.auth." + "$testStepName" + ".inst1.password"))
+
+    // Trace the start time
+    Date startStep1st = new Date()
+    long lStartStep1st = startStep1st.getTime();
+
+  if (strInstance1ArticleRequestID == "TD_KEY")
+  {
+    com.eviware.soapui.SoapUI.globalProperties.setPropertyValue("companyNoID", companyTDKey);
+  }
+  else if (strInstance1ArticleRequestID == "OFWI_ID")
+  {
+    com.eviware.soapui.SoapUI.globalProperties.setPropertyValue("companyNoID", companyOFWIID);
+  }
+  else if (strInstance1ArticleRequestID == "CRIFID_COREDB")
+  {
+    com.eviware.soapui.SoapUI.globalProperties.setPropertyValue("companyNoID", companyCRIFIDCoreDB);
+  }
+
+  // Run the test request for the first instance
+    log.info " ${text*6} Start testing for test Step: $testStepName for company  TD no " + companyTDKey + " at Excel data line # " +  indexExcel;
+    log.info " ${text*9} Running request to the first instance URL " + strFirstInstance +" with company number ID: " + com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("companyNoID");
+    testRunner.runTestStepByName("$testStepName");
+
+    // Trace the end time
+    Date endStep1st = new Date()
+    long lEndStep1st = endStep1st.getTime();
+    long diffPerfElapsedTimeStep1st = lEndStep1st - lStartStep1st;
+    long temporaryPerfElapsedTimeStep1st = diffPerfElapsedTimeStep1st;
+
+    // Calculate the elapsed time for the first instance
+    long secondInMillisStep1st = 1000;
+    long minuteInMillisStep1st = secondInMillisStep1st * 60;
+    long hourInMillisStep1st = minuteInMillisStep1st * 60;
+    long dayInMillisStep1st = hourInMillisStep1st * 24;
+    long elapsedDaysStep1st = temporaryPerfElapsedTimeStep1st / dayInMillisStep1st;
+    temporaryPerfElapsedTimeStep1st = temporaryPerfElapsedTimeStep1st % dayInMillisStep1st;
+    long elapsedHoursStep1st = temporaryPerfElapsedTimeStep1st / hourInMillisStep1st;
+    temporaryPerfElapsedTimeStep1st = temporaryPerfElapsedTimeStep1st % hourInMillisStep1st;
+    long elapsedMinutesStep1st = temporaryPerfElapsedTimeStep1st / minuteInMillisStep1st;
+    temporaryPerfElapsedTimeStep1st = temporaryPerfElapsedTimeStep1st % minuteInMillisStep1st;
+    long elapsedSecondsStep1st = temporaryPerfElapsedTimeStep1st / secondInMillisStep1st;
+    temporaryPerfElapsedTimeStep1st = temporaryPerfElapsedTimeStep1st % secondInMillisStep1st;
+    long elapsedMilliSecondsStep1st = temporaryPerfElapsedTimeStep1st % secondInMillisStep1st;
+
+    String perfElapsedTimeStep1st = elapsedDaysStep1st + "d " + elapsedHoursStep1st + "h " + elapsedMinutesStep1st + "m " + elapsedSecondsStep1st + "s+" + elapsedMilliSecondsStep1st + "ms"
+
+    List temporaryList = mapResult.get("$testStepName")
+    long temporaryLong1st = temporaryList.get(4) + diffPerfElapsedTimeStep1st
+    temporaryList.set(4, temporaryLong1st);
+    mapResult.put("$testStepName", temporaryList)
+    String temporaryXmlFile = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_temporaryXMLFile_FirstInstance" + "//" + "temporarely_First_XML_Response_" + "$testCase.name" + "_" + "$testStepName" + ".xml"
+    String temporaryXmlFile2 = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_temporaryXMLFile_SecondInstance" + "//" + "temporarely_Second_XML_Response_" + "$testCase.name" + "_" + "$testStepName" + ".xml"
+    boolean testResult = false;
+
+    /*
+     * Validate response and write into properties and xml file
+     */
+    testStep = wsdlTestSteps.get(indexRunner)
+
+    def counter = testStep.getAssertionList().size();
+    boolean validResponse = true;
+    String err1 = null
+    String err = null
+    String err2 = null
+    String strFileCompareTestResult = "FAILED"
+    String strAssertionErrorToReport = ""
+    String strException = null
+
+    String strAssertionError = ""
+
+    for (count in 0..<counter)
+    {
+        error = testStep.getAssertionAt(count).getErrors();
+        if (error != null)
+        {
+              validResponse = false;
+              strAssertionError = strAssertionError + error
+              strAssertionErrorToReport = "The first instance request's assertions FAILED by the following error(s) \"" +  strAssertionError + "\""
+              log.warn (" ${text*9} " + strAssertionErrorToReport)
+        }
+    }
+    def tempXmlResponse = null;
+    try
+    {
+     tempXmlResponse = groovyUtils.getXmlHolder("$testStepName#Response");
+    }
+    catch(Exception xex)
+    {
+     validResponse = false;
+     strException = xex.toString()
+     log.error (" ${text*9} XML Exception happens at the first instance " + xex.toString())
+    }
+    if(!validResponse)
+    {
+        log.error(" ${text*9} The $testStepName step is failed by the assertions check - STOP the test for this company " + companyName);
+        testResult = false;
+        strFileCompareTestResult = "BLOCKED"
+
+     if(strException != null)
+     {
+        err1 = strException
+     }
+     else
+     {
+        err1 = strAssertionErrorToReport;
+     }
+
+     err = err1;
+
+     temporaryList = mapResult.get("$testStepName")
+        temporaryNoteFirstInstance = "Blocked at company \"$companyName\", line number $indexExcel, reason: \"$err1 get from the first instance \"$strFirstInstance\""
+     int temporaryInt = temporaryList.get(2) + 1
+        temporaryList.set(2, temporaryInt);
+
+        mapResult.put("$testStepName", temporaryList)
+    }
+    else
+    {
+            // Write XML from response of the first instance to local
+            def xmlParser = new XmlParser()
+            responseXmlHolder = groovyUtils.getXmlHolder("$testStepName#Response");
+            def xmlNodeResponse = responseXmlHolder.getXml()
+            try
+            {
+                fileResponse = new File(temporaryXmlFile);
+                fileResponse.delete();
+                fileResponse.write(responseXmlHolder.xml, "UTF-8");
+            }
+            catch (Exception ex)
+            {
+                log.error(" ${text*9} ${ex.message}");
+                testResult = false;
+            }
+    }
+
+            // Set EndpointURL() for the second instance
+            testRunner.testCase.getTestStepByName("$testStepName").getHttpRequest().setEndpoint(strSecondInstance)
+           //-----Set Username/Password for instance 2--------
+
+          testRunner.testCase.getTestStepByName("$testStepName").httpRequest.setUsername(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.auth." + "$testStepName" + ".inst2.username"))
+          testRunner.testCase.getTestStepByName("$testStepName").httpRequest.setPassword(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.auth." + "$testStepName" + ".inst2.password"))
+
+            // Trace the start time
+        Date startStep2nd = new Date()
+        long lStartStep2nd = startStep2nd.getTime();
+
+    if (strInstance2ArticleRequestID == "TD_KEY")
+    {
+      com.eviware.soapui.SoapUI.globalProperties.setPropertyValue("companyNoID", companyTDKey);
+    }
+    else if (strInstance2ArticleRequestID == "OFWI_ID")
+    {
+      com.eviware.soapui.SoapUI.globalProperties.setPropertyValue("companyNoID", companyOFWIID);
+    }
+    else if (strInstance2ArticleRequestID == "CRIFID_COREDB")
+    {
+      com.eviware.soapui.SoapUI.globalProperties.setPropertyValue("companyNoID", companyCRIFIDCoreDB);
+    }
+
+      // Run the test request for the second instance
+            log.info " ${text*9} Running request to the second instance URL " + strSecondInstance +" with company number ID: " + com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("companyNoID");
+            testRunner.runTestStepByName("$testStepName");
+
+    // Trace the end time
+      Date endStep2nd = new Date()
+      long lEndStep2nd = endStep2nd.getTime();
+
+      long diffPerfElapsedTimeStep2nd = lEndStep2nd - lStartStep2nd;
+      long temporaryPerfElapsedTimeStep2nd = diffPerfElapsedTimeStep2nd;
+
+    // Calculate the elapsed time for the second instance
+    long secondInMillisStep2nd = 1000;
+    long minuteInMillisStep2nd = secondInMillisStep2nd * 60;
+    long hourInMillisStep2nd = minuteInMillisStep2nd * 60;
+    long dayInMillisStep2nd = hourInMillisStep2nd * 24;
+    long elapsedDaysStep2nd = temporaryPerfElapsedTimeStep2nd / dayInMillisStep2nd;
+    temporaryPerfElapsedTimeStep2nd = temporaryPerfElapsedTimeStep2nd % dayInMillisStep2nd;
+    long elapsedHoursStep2nd = temporaryPerfElapsedTimeStep2nd / hourInMillisStep2nd;
+    temporaryPerfElapsedTimeStep2nd = temporaryPerfElapsedTimeStep2nd % hourInMillisStep2nd;
+    long elapsedMinutesStep2nd = temporaryPerfElapsedTimeStep2nd / minuteInMillisStep2nd;
+    temporaryPerfElapsedTimeStep2nd = temporaryPerfElapsedTimeStep2nd % minuteInMillisStep2nd;
+    long elapsedSecondsStep2nd = temporaryPerfElapsedTimeStep2nd / secondInMillisStep2nd;
+    temporaryPerfElapsedTimeStep2nd = temporaryPerfElapsedTimeStep2nd % secondInMillisStep2nd;
+    long elapsedMilliSecondsStep2nd = temporaryPerfElapsedTimeStep2nd % secondInMillisStep2nd;
+    String perfElapsedTimeStep2nd = elapsedDaysStep2nd + "d " + elapsedHoursStep2nd + "h " + elapsedMinutesStep2nd + "m " + elapsedSecondsStep2nd + "s+" + elapsedMilliSecondsStep2nd + "ms"
+
+    String temporaryStrPerfElapsedTimeStep = perfElapsedTimeStep1st + "\n-------------------------\n" + perfElapsedTimeStep2nd
+
+    temporaryList = mapResult.get("$testStepName")
+    long temporaryLong2nd = temporaryList.get(5) + diffPerfElapsedTimeStep2nd
+    temporaryList.set(5, temporaryLong2nd);
+    mapResult.put("$testStepName", temporaryList)
+
+      validResponse = true;
+
+      strAssertionError = ""
+            counter = testStep.getAssertionList().size();
+            for (count in 0..<counter)
+            {
+                error = testStep.getAssertionAt(count).getErrors();
+                if (error != null)
+                {
+              validResponse = false;
+              strAssertionError = strAssertionError + error
+              strAssertionErrorToReport = "The second instance request's assertions FAILED by the following error(s) \"" +  strAssertionError + "\""
+              log.warn (" ${text*9} " + strAssertionErrorToReport)
+                }
+            }
+              tempXmlResponse = null;
+        xex2 = null
+        strException = null
+        try
+        {
+         tempXmlResponse = groovyUtils.getXmlHolder("$testStepName#Response");
+        }
+        catch(Exception xex2)
+        {
+             strException = xex2.toString()
+         validResponse = false;
+         log.error (" ${text*9} XML Exception happens at the second instance " + xex2.toString())
+        }
+            if(!validResponse)
+            {
+         log.error(" ${text*9} The $testStepName step is failed by the assertions check - STOP the test for this company " + companyName);
+            testResult = false;
+            strFileCompareTestResult = "BLOCKED"
+            if(strException != null)
+         {
+            err2 = strException
+         }
+         else
+         {
+            err2 = strAssertionErrorToReport;
+         }
+         String temporaryNoteNew;
+         String temporaryNoteSecondInstance = "Blocked at company \"$companyName\", line number $indexExcel, reason: \"$err2\" get from the second instance \"$strSecondInstance\" \n" + "\n"
+            if(err1 != null)
+            {
+                err = err1 + " and "+ err2
+                temporaryNoteNew = temporaryNoteFirstInstance + " AND there also " + temporaryNoteSecondInstance
+            }
+            else
+            {
+                err = err2;
+                temporaryNoteNew = temporaryNoteSecondInstance;
+            }
+
+            temporaryList = mapResult.get("$testStepName")
+         int temporaryInt;
+         if(temporaryNoteFirstInstance == "")
+         {
+              log.info("++++Increase Fail count due to temporaryList.get(2) + 1  in temporaryNoteFirstInstance+++++")
+             temporaryInt = temporaryList.get(2) + 1
+             log.info("temporaryList at if(temporaryNoteFirstInstance) " + temporaryList.get(2) )
+         }
+            else
+            {
+                log.info("Not Increase Fail count due to temporaryList.get(2) + 0  in temporaryNoteFirstInstance")
+                temporaryInt = temporaryList.get(2) + 0
+            }
+            temporaryList.set(2, temporaryInt);
+            String temporaryNoteOld = temporaryList.get(3).toString()
+            temporaryNoteReport = temporaryNoteOld + temporaryNoteNew
+            temporaryList.set(3, temporaryNoteReport);
+            mapResult.put("$testStepName", temporaryList)
+            errCompare = temporaryNoteReport
+
+            temporaryNoteReport = ""
+            temporaryNoteNew = ""
+            temporaryNoteSecondInstance = ""
+            temporaryNoteFirstInstance = ""
+            }
+
+            else
+            {
+                // Write XML from response of the second instance to local
+            	def xmlParser = new XmlParser()
+              responseXmlHolder = groovyUtils.getXmlHolder("$testStepName#Response");
+              def xmlNodeResponse = responseXmlHolder.getXml()
+              try
+              {
+                  fileResponse = new File(temporaryXmlFile2);
+                  fileResponse.delete();
+                  fileResponse.write(responseXmlHolder.xml, "UTF-8");
+              }
+              catch (Exception ex)
+              {
+                  log.error(" ${text*9} ${ex.message}");
+                  testResult = false;
+              }
+
+              if(err1 == null)
+              {
+                xmlParser = new XmlParser()
+              responseXmlHolder = groovyUtils.getXmlHolder("$testStepName#Response");
+            xmlNodeResponse = responseXmlHolder.getXml()
+              xmlFileResponse = xmlParser.parseText(xmlNodeResponse)
+              nodeXmlResponse = xmlFileResponse.'**'.find{ node-> node.name() == "message"}
+                    // Compare XML files
+                    // Get contents of the first response from XML file in local
+                    log.info " ${text*9} Comparing XML contents between the instance1 and instance 2 response";
+                    def writerFirstReponse = new StringWriter()
+                    def writerSecondResponse = new StringWriter()
+                    Node nodeFirstResponse = xmlParser.parse(temporaryXmlFile);
+                    strFirstResponse = XmlUtil.serialize(nodeFirstResponse);
+                    xmlFirstResponse = xmlParser.parseText(strFirstResponse);
+
+                    // Get contents of the second response from response of the request
+                    holder = groovyUtils.getXmlHolder("$testStepName#Response")
+                    secondResponse = holder.getXml()
+                    xmlSecondResponse = xmlParser.parseText(secondResponse)
+
+        // Define the ignored attributes - Please enter both node-attribute
+              String strIgnoreAttributesWithNode = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("listIgnoreAttribute")
+              if (strIgnoreAttributesWithNode)
+              {
+                    def lstIgnoreAttributesCouple = strIgnoreAttributesWithNode.split(',')
+
+                    for (j in 0..(lstIgnoreAttributesCouple.size())-1)
+                    {
+                            varCouple = lstIgnoreAttributesCouple[j].toString()
+                            def lstNodeAndAttribute = varCouple.split('-')
+
+                            varNode = lstNodeAndAttribute[0].toString().trim()
+                            varAttribute = lstNodeAndAttribute[1].toString().trim()
+
+                            log.info " ${text*15} The ignored attribute is " + varAttribute + " of node " + varNode
+                            def nodeArtikelList1 = xmlFirstResponse.'**'.findAll{ node-> node.name() == "$varNode"};
+                            def nodeArtikelList2 = xmlSecondResponse.'**'.findAll{ node-> node.name() == "$varNode"};
+
+                            if ( nodeArtikelList1.size() != 0)
+                            {
+                              def lstattribute = xmlFirstResponse.'**'.findAll{ it.name() == "$varNode" }.findAll { it.@"$varAttribute"}
+                              if (lstattribute.size() !=0)
+                              {
+                              lstattribute.each{ it.@"$varAttribute" = "This element is intentionally ignored for xml comparison"}
+                              }
+                              else
+                              {
+                                  log.warn " ${text*18} The ignored Attribute $varAttribute was not found from the first response"
+                              }
+                            }
+                            else
+                            {
+                               log.warn " ${text*18} The Node $varNode was not found from the first response"
+                            }
+
+
+                            if ( nodeArtikelList2.size() != 0)
+                            {
+                              def lstattribute = xmlSecondResponse.'**'.findAll{ it.name() == "$varNode" }.findAll { it.@"$varAttribute"}
+                              if (lstattribute.size() !=0)
+                              {
+                              lstattribute.each{ it.@"$varAttribute" = "This element is intentionally ignored for xml comparison"}
+                              }
+                              else
+                              {
+                                  log.warn " ${text*18} The ignored Attribute $varAttribute was not found from the second response"
+                              }
+                            }
+                            else
+                            {
+                               log.warn " ${text*18} The Node $varNode was not found from the second response"
+                            }
+                        }
+              }
+
+              // Define the ignored specific node - Please enter the node name in Property file
+              strIgnoreNode = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("listIgnoreSpecificNode")
+                      if(strIgnoreNode)
+                        {
+                          lstIgnoreNode = strIgnoreNode.split(',')
+
+                          // Edit the ignored nodes in xml response
+                          for (i in 0..(lstIgnoreNode.size())-1)
+                          {
+                              varNode = lstIgnoreNode[i].toString().trim()
+                              log.info " ${text*15} The ignore specific node is " + varNode
+
+                              lstNode = xmlFirstResponse.'**'."$varNode"
+                              lstNode1 = xmlSecondResponse.'**'."$varNode"
+                              if (lstNode.size() != 0)
+                              {
+                                       lstNode.each
+                                       {
+                                    it.value = "This element is intentionally ignored for xml comparison";
+                                       }
+                              }
+                              else
+                                {
+                                    log.warn " ${text*18} The ignored specific node $varNode was not found from the first response"
+                                }
+                                if (lstNode1.size() != 0)
+                              {
+                                       lstNode1.each
+                                       {
+                                    it.value = "This element is intentionally ignored for xml comparison";
+                                       }
+                              }
+                              else
+                                {
+                                    log.warn " ${text*18} The ignored specific node $varNode was not found from the second response"
+                                }
+                            }
+                          }
+ 
+          // Define ignored node and sub node - Please enter the node name in Property file
+          String strIgnoreNodeAndSubNode = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("listIgnoreNodeAndSubNodeValue")
+              if(strIgnoreNodeAndSubNode)
+              {
+                  def lstIgnoreNodeAndSubNode = strIgnoreNodeAndSubNode.split(',')
+
+                  // Edit the ignored nodes in xml response
+                  for (i in 0..(lstIgnoreNodeAndSubNode.size())-1)
+                  {
+                      varNode = lstIgnoreNodeAndSubNode[i].toString().trim()
+                      log.info " ${text*15} The ignore parent node is " + varNode
+
+                      p = xmlFirstResponse.'**'."$varNode"
+                      p1 = xmlSecondResponse.'**'."$varNode"
+                      if (p.size() != 0)
+                      {
+                               p.each
+                               {
+                                def childrenNodes = it.children();
+                                       if(childrenNodes.size() > 1)
+                                       {
+                                           for(childIndex in 0 ..(childrenNodes.size()-1))
+                                           {
+                                               childNode = childrenNodes[childIndex];
+                                               childNode.value = "This element is intentionally ignored for xml comparison";
+                                           }
+                                        }
+                                    else
+                                    {
+                                         it.value = "This element is intentionally ignored for xml comparison";
+                                    }
+                        }
+                      }
+                        else
+                        {
+                            log.warn " ${text*18} The ignored parent node $varNode was not found from the first response"
+                        }
+                        if (p1.size() != 0)
+                        {
+                                p1.each
+                                {
+                                    def childrenNodes = it.children();
+                                    if(childrenNodes.size() > 1)
+                                        {
+                                            for(childIndex in 0 ..(childrenNodes.size()-1))
+                                            {
+                                                 childNode = childrenNodes[childIndex];
+                                                  childNode.value = "This element is intentionally ignored for xml comparison";
+                                            }
+                                    }
+                                   else
+                                   {
+                                    it.value = "This element is intentionally ignored for xml comparison";
+                                   }
+                              }
+                          }
+                          else
+                          {
+                                   log.warn " ${text*18} The ignored parent node $varNode was not found from the second response"
+                          }
+                       }
+                }
+
+                    // Set contents of first response to compare
+                    new XmlNodePrinter(new PrintWriter(writerFirstReponse)).print(xmlFirstResponse)
+                    strFirstResponse = writerFirstReponse.toString()
+                    nodeFirstResponse = xmlParser.parseText(strFirstResponse)
+                    strFirstResponse = XmlUtil.serialize(nodeFirstResponse)
+                    log.info " ${text*15} first response is... : " + strFirstResponse
+
+                    // Set contents of second response to compare
+                    new XmlNodePrinter(new PrintWriter(writerSecondResponse)).print(xmlSecondResponse)
+                    strSecondResponse = writerSecondResponse.toString()
+                    nodeSecondResponse = xmlParser.parseText(strSecondResponse)
+                    strSecondResponse = XmlUtil.serialize(nodeSecondResponse)
+                    log.info "${text*15} second response is... : " + strSecondResponse
+
+                    // Configure the compare setting
+                    XMLUnit.setIgnoreWhitespace(true)
+                    XMLUnit.setIgnoreComments(true)
+                    XMLUnit.setIgnoreDiffBetweenTextAndCDATA(true)
+                    XMLUnit.setNormalizeWhitespace(true)
+                    XMLUnit.setIgnoreAttributeOrder(true)
+
+                    // Compare the XMLcontens - Report if there is any inconsistency
+                   
+                    xmlDiff = new Diff(strFirstResponse, strSecondResponse)
+                    def detailedDiff = new DetailedDiff(xmlDiff)
+                    List differences = detailedDiff.getAllDifferences()
+                       testResult = xmlDiff.identical()
+                    /*
+                    * Log test result status
+                    */
+                    if(testResult)
+                     {
+                        log.info " ${text*9} Compare XML files - Result testing for testStep $testStepName : ------>>>>>> PASSED";
+                        strFileCompareTestResult = "PASSED"
+                        temporaryList = mapResult.get("$testStepName")
+                        int temporaryInt = temporaryList.get(0) + 1
+                        temporaryList.set(0, temporaryInt);
+                        mapResult.put("$testStepName", temporaryList)
+                        errCompare = "Function works well "
+                     }
+                     else
+                     {
+              		 errCompare = getErrorMessageCompare(differences);
+                     log.error " ${text*9} Compare XML files - Result testing for testStep $testStepName : ------>>>>>> FAILED due to the missmatch error " + errCompare;
+                     temporaryList = mapResult.get("$testStepName")
+                     int temporaryInt = temporaryList.get(1) + 1
+                     temporaryList.set(1, temporaryInt);
+		                   String temporaryNoteOld = temporaryList.get(3).toString()
+		                   String temporaryNoteNew = "Failed at company \"" + companyOFWIID + " , line number $indexExcel, reason: \n" + errCompare.toString() + "\n"
+		                   temporaryNoteReport = temporaryNoteOld + temporaryNoteNew
+		                   temporaryList.set(3, temporaryNoteReport);
+		                   mapResult.put("$testStepName", temporaryList)
+		                   temporaryNoteReport = ""
+		                   temporaryNoteNew = ""
+          		}
+			}
+             else
+          {
+             errCompare = temporaryNoteFirstInstance;
+            temporaryList = mapResult.get("$testStepName")
+            temporaryList.set(3, temporaryNoteFirstInstance);
+            mapResult.put("$testStepName", temporaryList)
+            temporaryNoteFirstInstance = ""
+          }
+
+          }
+
+    // Write result to ouput Excel file
+      cellResult = new Label(indexHeaderResult, indexExcel,strFileCompareTestResult);
+
+		WritableFont cellFontResult = new WritableFont(WritableFont.ARIAL,10);
+		cellFontResult.setBoldStyle(WritableFont.BOLD); 
+		
+		WritableCellFormat cellFormatHighlightPassed = new WritableCellFormat(cellFontResult);
+		cellFormatHighlightPassed.setWrap(true)
+		cellFormatHighlightPassed.setBackground(Colour.GREEN);
+		
+		WritableCellFormat cellFormatHighlightBlocked = new WritableCellFormat(cellFontResult);
+		cellFormatHighlightPassed.setWrap(true)
+		cellFormatHighlightBlocked.setBackground(Colour.YELLOW);
+		
+		WritableCellFormat cellFormatHighlightFailed = new WritableCellFormat(cellFontResult);
+		cellFormatHighlightPassed.setWrap(true)
+		cellFormatHighlightFailed.setBackground(Colour.RED);
+    	    
+	    if(strFileCompareTestResult == "PASSED")
+	    {
+	    		cellResult = new Label(indexHeaderResult, indexExcel,strFileCompareTestResult, cellFormatHighlightPassed);
+	    }
+	    else if(strFileCompareTestResult == "BLOCKED")
+	    {
+	    		cellResult = new Label(indexHeaderResult, indexExcel,strFileCompareTestResult, cellFormatHighlightBlocked);
+	    }
+	    else if(strFileCompareTestResult == "FAILED")
+	    {
+	    		cellResult = new Label(indexHeaderResult, indexExcel,strFileCompareTestResult, cellFormatHighlightFailed);
+	    }
+	    else
+	    {
+	    		cellResult = new Label(indexHeaderResult, indexExcel,strFileCompareTestResult);
+	    }
+      
+      sheetResult.addCell(cellResult)
+
+      if(err == null)
+      {
+      	cell.setSize(15000);
+	    	sheetResult.setColumnView(indexHeaderResult + 1, cell);
+          cellResultNotes = new Label(indexHeaderResult + 1, indexExcel, errCompare);
+      }
+	    else
+	    {
+	    	    //Write notes to the external txt file - Fixed for the maximum characters of Excel cell
+	    		//String testStepNoteFile = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "SPC_testResults" + "//" + "$testStepName" + "_Result_articleRequest_Details_Notes.txt"
+	    		//cellResultNotes = new Label(indexHeaderResult + 1, indexExcel, "Please refer to the TXT note file " + testStepNoteFile.replace("//", "/"));
+	    		//errCompare = getErrorMessageCompare(differences);
+	    		cell.setSize(15000);
+	    		sheetResult.setColumnView(indexHeaderResult + 1, cell);
+			cellResultNotes = new Label(indexHeaderResult + 1, indexExcel, errCompare);
+	    }
+
+		// Write xml response to the Reference sheet
+		sheetResult.addCell(cellResultNotes);
+		// format Reference sheet
+	    WritableCellFormat cellFormatWraptText = new WritableCellFormat();
+	    cellFormatWraptText.setWrap(true);
+		
+	    cell.setSize(20000);
+	    sheetReference.setColumnView(indexHeaderResult, cell);
+		
+	    cell.setSize(20000);
+	    sheetReference.setColumnView(indexHeaderResult + 1, cell);
+
+	    cellFirstResponse =  new Label(indexHeaderResult, indexExcel,strFirstResponse, cellFormatWraptText); 
+	    sheetReference.addCell(cellFirstResponse)
+
+	    cellSecondResponse =  new Label(indexHeaderResult + 1, indexExcel,strSecondResponse, cellFormatWraptText); 
+	    sheetReference.addCell(cellSecondResponse)
+    
+
+    log.info " ${text*6} End testing for test Step: $testStepName for company TD No " + companyTDKey + " at Excel data line # " +  indexExcel;
+    log.info " ${text*100}";
+    indexRunner = indexRunner + 1
+    indexHeaderResult =  indexHeaderResult + 2
+    
+    int subNumber = Math.abs(diffPerfElapsedTimeStep2nd - diffPerfElapsedTimeStep1st)
+    int averageNumber = (diffPerfElapsedTimeStep2nd + diffPerfElapsedTimeStep1st) / 2
+    int differPercentage = (subNumber/averageNumber) * 100
+
+    if(differPercentage >= intLimitOfDifferentPercentage)
+    {
+        perfElapsedTimeDetails = new Label(temporaryIntForPerformanceTestStepDetails, temporaryIndex , temporaryStrPerfElapsedTimeStep, cellFormatHighlight);
+    }
+    else
+    {
+        perfElapsedTimeDetails = new Label(temporaryIntForPerformanceTestStepDetails, temporaryIndex , temporaryStrPerfElapsedTimeStep, cellFormat);
+    }
+        sheetPerformance.addCell(perfElapsedTimeDetails);
+     temporaryIntForPerformanceTestStepDetails = temporaryIntForPerformanceTestStepDetails + 1
+}
+// End all test case 
+
+if (flagRetrievedPerson == "true")
+{
+  // Write person test data
+  strInstanceToGetPerson = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.retrived.person.whichInstance")
+  strCompanyArticlesRetrievePerson = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("listCompanyArticlesRetrievePerson")
+  listCompanyArticlesRetrievePerson = strCompanyArticlesRetrievePerson.split(',');
+  for (i in 0..(listCompanyArticlesRetrievePerson.size())-1)
+  {
+    varArticle = listCompanyArticlesRetrievePerson[i].toString().trim()
+    if (listNameSteps.contains(varArticle))
+    {
+    def xmlParser = new XmlParser()
+          if(strInstanceToGetPerson == "1")
+          {
+              temporaryXmlFile = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_temporaryXMLFile_FirstInstance" + "//" + "temporarely_First_XML_Response_" + "$testCase.name" + "_" + "$varArticle" + ".xml"
+              Node nodeFirstResponse = xmlParser.parse(temporaryXmlFile);
+                    strFirstResponse = XmlUtil.serialize(nodeFirstResponse);
+                    xmlFileResponse = xmlParser.parseText(strFirstResponse);
+                    def nodeXmlResponsePerson = xmlFileResponse.'**'.findAll{ node-> node.name() == "person"};
+                    def limitPerson = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.limited.person").toInteger();
+                    nodeXmlResponsePerson.each{
+                        if(limitPerson > 0)
+                        {
+                            String personID = it.parent().key.@id;
+                            personID = personID.replace("[" , "");
+                            personID = personID.replace("]" , "");
+                            if (!personIDs.contains(personID))
+                            {
+                                String firstName = it.firstName.text();
+                                String lastName = it.lastName.text();
+                                String personStreet = "";
+                                String houseNumber = "";
+                                String city = "";
+                                String zipCode ="";
+                                String country = "";
+                                def addressNode = it.parent().address.get(0);
+                                if(addressNode != null)
+                                {
+                                    personStreet = addressNode.street.text();
+                                    houseNumber = addressNode.number.text();
+                                    city = addressNode.city.text();
+                                    zipCode = addressNode.zipCode.text();
+                                    country = addressNode.countryCode.text();
+                                }
+                                if(firstName != "")
+                                {
+                                cellIDTestDataPerson = new Label(0, indexExelOutputTestDataPerson, personID);
+                                cellFirstNameTestDataPerson = new Label(1, indexExelOutputTestDataPerson, firstName);
+                                cellLastNameTestDataPerson = new Label(2, indexExelOutputTestDataPerson, lastName);
+                                cellStreetTestDataPerson = new Label(3, indexExelOutputTestDataPerson, personStreet);
+                                cellHouseNumberTestDataPerson = new Label(4, indexExelOutputTestDataPerson, houseNumber);
+                                cellCityTestDataPerson = new Label(5, indexExelOutputTestDataPerson, city);
+                                cellZipCodeTestDataPerson = new Label(6, indexExelOutputTestDataPerson, zipCode);
+                                cellCountryTestDataPerson = new Label(7, indexExelOutputTestDataPerson, country);
+
+                                sheetTestDataPerson.addCell(cellIDTestDataPerson);
+                                sheetTestDataPerson.addCell(cellLastNameTestDataPerson);
+                                sheetTestDataPerson.addCell(cellFirstNameTestDataPerson);
+                                sheetTestDataPerson.addCell(cellStreetTestDataPerson);
+                                sheetTestDataPerson.addCell(cellHouseNumberTestDataPerson);
+                                sheetTestDataPerson.addCell(cellCityTestDataPerson);
+                                sheetTestDataPerson.addCell(cellZipCodeTestDataPerson);
+                                sheetTestDataPerson.addCell(cellCountryTestDataPerson);
+
+                                indexExelOutputTestDataPerson = indexExelOutputTestDataPerson + 1;
+                                personIDs.add(personID);
+                                limitPerson = limitPerson -1;
+                            }
+                        }
+                      }
+                    }
+            }
+            else if(strInstanceToGetPerson == "2")
+            {
+              responseXmlHolder = groovyUtils.getXmlHolder("$varArticle#Response");
+              secondResponse = responseXmlHolder.getXml()
+              xmlSecondResponse = xmlParser.parseText(secondResponse)
+
+              def nodeXmlResponsePerson = xmlSecondResponse.'**'.findAll{ node-> node.name() == "person"};
+                    def limitPerson = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.limited.person").toInteger();
+                    nodeXmlResponsePerson.each{
+                        if(limitPerson > 0)
+                        {
+                            String personID = it.parent().key.@id;
+                            personID = personID.replace("[" , "");
+                            personID = personID.replace("]" , "");
+                            if (!personIDs.contains(personID))
+                            {
+                                String firstName = it.firstName.text();
+                                String lastName = it.lastName.text();
+                                String personStreet = "";
+                                String houseNumber = "";
+                                String city = "";
+                                String zipCode ="";
+                                String country = "";
+                                def addressNode = it.parent().address.get(0);
+                                if(addressNode != null)
+                                {
+                                    personStreet = addressNode.street.text();
+                                    houseNumber = addressNode.number.text();
+                                    city = addressNode.city.text();
+                                    zipCode = addressNode.zipCode.text();
+                                    country = addressNode.countryCode.text();
+                                }
+                                if(firstName != "")
+                                {
+                                  if (com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.instance2ArticleRequestID") == "OFWI_ID")
+                                  {
+                                    cellIDTestDataPerson = new Label(0, indexExelOutputTestDataPerson, personID);
+                                    }
+                                    else if (com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.instance2ArticleRequestID") == "TD_KEY")
+                                    {
+                                      cellIDTestDataPerson = new Label(8, indexExelOutputTestDataPerson, personID);
+                                      }
+                                      else if (com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.instance2ArticleRequestID") == "CRIFID_COREDB")
+                                      {
+                                        cellIDTestDataPerson = new Label(9, indexExelOutputTestDataPerson, personID);
+                                        }
+
+                                cellFirstNameTestDataPerson = new Label(1, indexExelOutputTestDataPerson, firstName);
+                                cellLastNameTestDataPerson = new Label(2, indexExelOutputTestDataPerson, lastName);
+                                cellStreetTestDataPerson = new Label(3, indexExelOutputTestDataPerson, personStreet);
+                                cellHouseNumberTestDataPerson = new Label(4, indexExelOutputTestDataPerson, houseNumber);
+                                cellCityTestDataPerson = new Label(5, indexExelOutputTestDataPerson, city);
+                                cellZipCodeTestDataPerson = new Label(6, indexExelOutputTestDataPerson, zipCode);
+                                cellCountryTestDataPerson = new Label(7, indexExelOutputTestDataPerson, country);
+
+                                sheetTestDataPerson.addCell(cellIDTestDataPerson);
+                                sheetTestDataPerson.addCell(cellLastNameTestDataPerson);
+                                sheetTestDataPerson.addCell(cellFirstNameTestDataPerson);
+                                sheetTestDataPerson.addCell(cellStreetTestDataPerson);
+                                sheetTestDataPerson.addCell(cellHouseNumberTestDataPerson);
+                                sheetTestDataPerson.addCell(cellCityTestDataPerson);
+                                sheetTestDataPerson.addCell(cellZipCodeTestDataPerson);
+                                sheetTestDataPerson.addCell(cellCountryTestDataPerson);
+
+                                indexExelOutputTestDataPerson = indexExelOutputTestDataPerson + 1;
+                                personIDs.add(personID);
+                                limitPerson = limitPerson -1;
+                            }
+                        }
+                      }
+                    }
+
+            }
+            else
+            {
+              log.warn (" ${text*9} " + "=== The decided instance to get person data is not defined or it is incorrect. Please check the property file ===")
+            }
+
+    }
+  }
+}
+// Write the number of pass-fail-warning-block
+temporaryIntForMap = 0
+indexTempRowReportSummaryOfTestStep = 9
+while(temporaryIntForMap < wsdlTestSteps.size())
+{
+    // Get current test step Name
+    testStepName = wsdlTestSteps.get(temporaryIntForMap).name
+
+    // Write the test step labels
+    summaryTestSteps =  new Label(0, indexTempRowReportSummaryOfTestStep, "$testStepName", cellFormat)
+    perfTestSteps =  new Label(0, indexTempRowReportSummaryOfTestStep, "$testStepName", cellFormat)
+    //sheetSummary.addCell(summaryTestSteps);
+    sheetPerformance.addCell(perfTestSteps);
+  List listTestResultOutput = mapResult.get("$testStepName")
+  String noPass = listTestResultOutput.get(0).toString()
+  int intnoPass = listTestResultOutput.get(0)
+  String noFail = listTestResultOutput.get(1).toString()
+  int intnoFail = listTestResultOutput.get(1)
+  String noBlock = listTestResultOutput.get(2).toString()
+  int intnoBlock = listTestResultOutput.get(2)
+  String detectedNote = listTestResultOutput.get(3).toString()
+
+        long llapsedTime1st = listTestResultOutput.get(4)
+    long llapsedTime2nd = listTestResultOutput.get(5)
+
+    // Calculate the elapsed time for the first instance
+  long secondInMillis1st = 1000;
+  long minuteInMillis1st = secondInMillis1st * 60;
+  long hourInMillis1st = minuteInMillis1st * 60;
+  long dayInMillis1st = hourInMillis1st * 24;
+  long elapsedDays1st = llapsedTime1st / dayInMillis1st;
+  llapsedTime1st = llapsedTime1st % dayInMillis1st;
+  long elapsedHours1st = llapsedTime1st / hourInMillis1st;
+  llapsedTime1st = llapsedTime1st % hourInMillis1st;
+  long elapsedMinutes1st = llapsedTime1st / minuteInMillis1st;
+  llapsedTime1st = llapsedTime1st % minuteInMillis1st;
+  long elapsedSeconds1st = llapsedTime1st / secondInMillis1st;
+  llapsedTime1st = llapsedTime1st % secondInMillis1st;
+  long elapsedMilliSeconds1st = llapsedTime1st % secondInMillis1st;
+  String elapsedTimeOutput1st = elapsedDays1st + "d " + elapsedHours1st + "h " + elapsedMinutes1st + "m " + elapsedSeconds1st + "s+" + elapsedMilliSeconds1st + "ms"
+
+      // Calculate the elapsed time for the second instance
+  long secondInMillis2nd = 1000;
+  long minuteInMillis2nd = secondInMillis2nd * 60;
+  long hourInMillis2nd = minuteInMillis2nd * 60;
+  long dayInMillis2nd = hourInMillis2nd * 24;
+  long elapsedDays2nd = llapsedTime2nd / dayInMillis2nd;
+  llapsedTime2nd = llapsedTime2nd % dayInMillis2nd;
+  long elapsedHours2nd = llapsedTime2nd / hourInMillis2nd;
+  llapsedTime2nd = llapsedTime2nd % hourInMillis2nd;
+  long elapsedMinutes2nd = llapsedTime2nd / minuteInMillis2nd;
+  llapsedTime2nd = llapsedTime2nd % minuteInMillis2nd;
+  long elapsedSeconds2nd = llapsedTime2nd / secondInMillis2nd;
+  llapsedTime2nd = llapsedTime2nd % secondInMillis2nd;
+  long elapsedMilliSeconds2nd = llapsedTime2nd % secondInMillis2nd;
+  String elapsedTimeOutput2nd = elapsedDays2nd + "d " + elapsedHours2nd + "h " + elapsedMinutes2nd + "m " + elapsedSeconds2nd + "s+" + elapsedMilliSeconds2nd + "ms"
+
+    perfTotalElapsedTime1st = new Label(2, indexTempRowReportSummaryOfTestStep, elapsedTimeOutput1st, cellFormat)
+    perfTotalElapsedTime2nd = new Label(3, indexTempRowReportSummaryOfTestStep, elapsedTimeOutput2nd, cellFormat)
+    sheetPerformance.addCell(perfTotalElapsedTime1st);
+    sheetPerformance.addCell(perfTotalElapsedTime2nd);
+
+    /*summaryNoOfPassValue = new Label(2, indexTempRowReportSummaryOfTestStep, noPass, cellFormat);
+    sheetSummary.addCell(summaryNoOfPassValue);
+    summaryNoOfFailValue = new Label(3, indexTempRowReportSummaryOfTestStep, noFail, cellFormat);
+    sheetSummary.addCell(summaryNoOfFailValue);
+    summaryNoOfBlockValue = new Label(4, indexTempRowReportSummaryOfTestStep, noBlock, cellFormat);
+    sheetSummary.addCell(summaryNoOfBlockValue);*/
+
+
+
+    int intNoOfTested = intnoPass + intnoFail + intnoBlock
+    summaryNoOfTestedValue = new Label(1, indexTempRowReportSummaryOfTestStep, intNoOfTested.toString(), cellFormat)
+    perfNoOfTestedValue = new Label(1, indexTempRowReportSummaryOfTestStep, intNoOfTested.toString(), cellFormat)
+    //sheetSummary.addCell(summaryNoOfTestedValue);
+    sheetPerformance.addCell(perfNoOfTestedValue);
+
+    if(noFail.toInteger() == 0 && noBlock.toInteger() == 0)
+    {
+        summaryNoteValue = new Label(5, indexTempRowReportSummaryOfTestStep, "Functions work well", cellFormat);
+    }
+    else
+    {
+          //Write notes to the external txt file - Fixed for the maximum characters of Excel cell
+        summaryNoteValue = new Label(5, indexTempRowReportSummaryOfTestStep, "Please refer to sheet 'Detailed' for more detail", cellFormat);
+    }
+   // sheetSummary.addCell(summaryNoteValue);
+
+    temporaryIntForMap = temporaryIntForMap + 1
+    indexTempRowReportSummaryOfTestStep = indexTempRowReportSummaryOfTestStep + 1
+     //Refactor sheet summary
+     int indexToWriteTable =  locateIndexCellStatus( false, 0,  sheetSummary)
+     createSummaryTableLabel(indexToWriteTable, sheetSummary, "$testStepName", cellFormat)
+
+}
+
+// Write Performance statistic
+Label perfDataID = new Label(0, indexTempRowReportSummaryOfTestStep + 3, com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.instance1ArticleRequestID") + "\n-------------------------\n" + com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("config.bis.instance2ArticleRequestID"), cellFormat);
+Label perfDataCompPerName= new Label(1, indexTempRowReportSummaryOfTestStep + 3, "COMPANY_NAME OR PERSON_SURENAME", cellFormat);
+sheetPerformance.addCell(perfDataID);
+sheetPerformance.addCell(perfDataCompPerName);
+temporaryIntForPerformanceTestStepDetails = 2
+temporaryIntForMap = 0
+while(temporaryIntForMap < wsdlTestSteps.size())
+{
+    // Get current test step Name
+    testStepName = wsdlTestSteps.get(temporaryIntForMap).name
+
+    // Write the test step labels
+    perfTestStepsDetails =  new Label(temporaryIntForPerformanceTestStepDetails, indexTempRowReportSummaryOfTestStep + 3, "$testStepName", cellFormat)
+    sheetPerformance.addCell(perfTestStepsDetails);
+
+    cell.setSize(10000);
+    sheetPerformance.setColumnView(temporaryIntForPerformanceTestStepDetails, cell);
+
+    temporaryIntForMap = temporaryIntForMap + 1
+    temporaryIntForPerformanceTestStepDetails = temporaryIntForPerformanceTestStepDetails + 1
+}
+
+indexHeaderResult = numberOfColumns
+indexRunner = 0
+indexExcel = indexExcel + 1
+indexNextEntiryInPerformance = indexNextEntiryInPerformance + 1
+
+
+
+excelResult.write()
+excelResult.close()
+
+
+
+//Backup test result file
+workbookBackup = Workbook.getWorkbook(new File(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_testResults//" + "Test_Result_$testCase.name" + ".xls"),settings)
+filePathBackup = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_testResults//" + "Backup_Test_Result_$testCase.name" + ".xls"
+f = new File(filePathBackup)
+excelResultBackup = Workbook.createWorkbook(new File(filePathBackup), workbookBackup);
+excelResultBackup.write()
+excelResultBackup.close()
+
+}
+
+workbook = Workbook.getWorkbook(new File(com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_testResults//" + "Test_Result_$testCase.name" + ".xls"),settings)
+
+filePath = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_testResults//" + "Test_Result_$testCase.name" + ".xls"
+f = new File(filePath)
+
+excelResult = Workbook.createWorkbook(new File(filePath), workbook);
+sheetResult = excelResult.getSheet(0);
+sheetSummary = excelResult.getSheet(1);
+sheetPerformance = excelResult.getSheet(2);
+sheetIssues = excelResult.getSheet(3);
+// Trace the end time
+Date stop = new Date()
+long l2 = stop.getTime();
+String endTimeOutput = stop.format("yyyy-MM-dd HH:mm:ss")
+summaryEndTimeValue = new Label(1, 3, endTimeOutput, cellFormat);
+perfEndTimeValue = new Label(1, 3, endTimeOutput, cellFormat);
+
+long diff = l2 - l1;
+
+// Calculate the elapsed time
+long secondInMillis = 1000;
+long minuteInMillis = secondInMillis * 60;
+long hourInMillis = minuteInMillis * 60;
+long dayInMillis = hourInMillis * 24;
+
+long elapsedDays = diff / dayInMillis;
+diff = diff % dayInMillis;
+
+long elapsedHours = diff / hourInMillis;
+diff = diff % hourInMillis;
+
+long elapsedMinutes = diff / minuteInMillis;
+diff = diff % minuteInMillis;
+
+long elapsedSeconds = diff / secondInMillis;
+diff = diff % secondInMillis;
+
+long elapsedMilliSeconds = diff % secondInMillis;
+
+String elapsedTimeOutput = elapsedDays + "d " + elapsedHours + "h " + elapsedMinutes + "m " + elapsedSeconds + "s+" + elapsedMilliSeconds + "ms"
+summaryTotalElapsedTimeValue =  new Label(1, 4, elapsedTimeOutput, cellFormat);
+perfTotalElapsedTimeValue =  new Label(1, 4, elapsedTimeOutput, cellFormat);
+
+// Write some Summary values
+sheetSummary.addCell(summaryEndTimeValue);
+sheetSummary.addCell(summaryTotalElapsedTimeValue);
+
+// Write some Performance values
+sheetPerformance.addCell(perfEndTimeValue);
+sheetPerformance.addCell(perfTotalElapsedTimeValue);
+//---------------------------------------------------------------- write issue into in Issues sheet---------------------------------------------------
+      //def printXmlDocument(org.w3c.dom.Document document, WritableSheet sheetIssues, WritableCellFormat cellFormat, int indexExcelToWriteData, int Collumn)
+         def printXmlDocument(org.w3c.dom.Document document, WritableSheet sheetIssues, WritableCellFormat cellFormat, int indexExcelToWriteData, int Collumn)
+         {
+          log.info("======Start to write block issue in xml format to Excel file========== ")
+            DOMImplementationLS domImplementationLS = (DOMImplementationLS) document
+                .getImplementation();
+            LSSerializer lsSerializer = domImplementationLS.createLSSerializer();
+             String string = lsSerializer.writeToString(document);
+             log.info("Print xml document is      " + string)
+             cellResultNotesHai = new Label(Collumn, indexExcelToWriteData, string, cellFormat);
+             sheetIssues.addCell(cellResultNotesHai);
+          }
+
+
+
+
+// Write and close the file
+excelResult.write();
+excelResult.close();
+
+if(workbookTestDataPerson != null)
+{
+  workbookTestDataPerson.write();
+  workbookTestDataPerson.close();
+}
+
+//Backup test result file
+filePathBackup = com.eviware.soapui.SoapUI.globalProperties.getPropertyValue("testData.file.output.path") + "//SPC_testResults//" + "Backup_Test_Result_$testCase.name" + ".xls"
+f = new File(filePathBackup);
+f.delete();
+
+workbook.close();
+log.info " ${text*3} End testing for testCase: $testCase.name"
+log.info " ${star*400}";
+
+
+/*************************************************************
+ * Format compare error messages
+ */
+
+String getErrorMessageCompare(List differences)
+{
+	String errCompare = "";
+	for(int i = 0; i < differences.size(); i++)
+	{
+		Difference difference;
+	    	difference = differences.get(i);
+	    	
+	    	if(!difference.isRecoverable())
+	    	{
+	    		if(!difference.getDescription().equalsIgnoreCase("number of child nodes") && !difference.getDescription().equalsIgnoreCase("sequence of child nodes"))
+	    		{
+	    			if(difference.getDescription().equalsIgnoreCase("attribute value"))
+	    			{
+	    				errCompare += "[different attribute value] " + difference.toString() + "\n\n";
+	    				//System.out.println("[xpath] " + difference.getControlNodeDetail().getXpathLocation());
+	    			}
+	    			else if(difference.getDescription().equalsIgnoreCase("presence of child node"))
+	    			{
+	    				errCompare += "[different node structure] " + difference.toString() + "\n\n";
+	    				//System.out.println("[xpath] " + difference.getControlNodeDetail());
+	    			}
+	    			else if(difference.getDescription().equalsIgnoreCase("presence of child nodes to be"))
+	    			{
+	    				errCompare += "[different node structure] " + difference.toString() + "\n\n";
+	    				//System.out.println("[xpath] " + difference.getControlNodeDetail());
+	    			}
+	    			else if(difference.getDescription().equalsIgnoreCase("text value"))
+	    			{
+	    				errCompare += "[different node value] " + difference.toString() + "\n\n";
+	    				//System.out.println("[xpath] " + difference.getControlNodeDetail().getXpathLocation());
+	    			}
+	    			else
+	    			{
+	    				errCompare += "[different unknown] " + difference.toString() + "\n\n";
+	    				//System.out.println("[xpath] " + difference.getControlNodeDetail().getXpathLocation());
+	    			}
+	    		}
+	    	}
+	}
+	return errCompare;
+}
+
+String printNode(org.w3c.dom.Node nodeInput)
+{
+	if (nodeInput != null)
+        {
+        	org.w3c.dom.Node node = nodeInput;
+        if (nodeInput.getNodeType() == org.w3c.dom.Node.ATTRIBUTE_NODE) {
+        	node = nodeInput.getOwnerElement();
+        }
+     StringWriter sw = new StringWriter();
+     try {
+     	Transformer t = TransformerFactory.newInstance().newTransformer();
+     	t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+     	t.transform(new DOMSource(node), new StreamResult(sw));
+     } catch (TransformerException te) {
+
+     }
+     	return sw.toString();
+     }
+        return null;
+}
