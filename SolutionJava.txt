@@ -1,0 +1,14 @@
+    static void staircase(int n) {
+        String text ="#";
+        for (int row = 0; row < n; row++)
+        {
+            String textSpace ="";
+            // int space = 1, it is for when last loop, no space is added
+            for(int space = 1; space < n - row ; space++)
+            {
+                textSpace = " " + textSpace;
+            }
+            System.out.println(textSpace + text);
+            text =  "#" + text;         
+        }      
+    }
